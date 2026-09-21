@@ -15,8 +15,9 @@ const sortOptions: { value: SortKey; label: string }[] = [
 ]
 
 const selectClass =
-  'cursor-pointer rounded border border-primary-border bg-white px-2.5 py-2 text-sm outline-none'
-const labelClass = 'flex flex-col gap-1.5 text-xs font-semibold text-muted'
+  'cursor-pointer rounded-md border border-primary-border bg-surface px-2.5 py-2 text-sm outline-none focus:border-primary'
+const labelClass =
+  'flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wide text-muted'
 
 export default function Shop() {
   const [products, setProducts] = useState<Product[]>([])
@@ -85,17 +86,18 @@ export default function Shop() {
 
   return (
     <>
-      <section className="page-banner bg-shop-header [background-position:top_25%_right_0]">
-        <h2>#stayhome</h2>
-        <p className="text-white">Save more with coupons &amp; up to 70% off</p>
+      <section className="page-banner">
+        <div className="banner-rule" />
+        <h2>Shop the marketplace</h2>
+        <p>Every listing from every merchant on EreMarket — filter by category or search a shop.</p>
       </section>
 
-      <section className="flex flex-col items-stretch justify-between gap-5 px-5 pt-10 sm:px-10 lg:flex-row lg:items-center lg:px-20">
-        <div className="flex max-w-sm flex-1 items-center gap-2.5 rounded border border-primary-border px-4 py-2.5">
+      <section className="flex flex-col items-stretch justify-between gap-5 border-b border-primary-border bg-surface-2 px-5 py-6 sm:px-10 lg:flex-row lg:items-center lg:px-20">
+        <div className="flex max-w-sm flex-1 items-center gap-2.5 rounded-md border border-primary-border bg-surface px-4 py-2.5 focus-within:border-primary">
           <i className="fa-solid fa-magnifying-glass text-primary"></i>
           <input
             type="search"
-            placeholder="Search products or brands..."
+            placeholder="Search products or shops..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search products"
@@ -151,19 +153,21 @@ export default function Shop() {
           </div>
         ) : (
           <>
-            <p className="mb-2.5 text-sm text-muted-2">
-              Showing {visible.length} of {products.length} products
+            <p className="mb-4 text-sm text-muted-2">
+              Showing <span className="font-bold text-primary">{visible.length}</span> of{' '}
+              {products.length} products
             </p>
             {visible.length === 0 ? (
-              <div className="py-16 text-center">
-                <i className="fa-regular fa-face-frown mb-4 text-5xl text-primary-border"></i>
-                <h4 className="mb-4 text-xl">No products match your filters.</h4>
+              <div className="empty-state">
+                <img src="/assets/images/empty-catalog.svg" alt="" aria-hidden="true" />
+                <h4>Nothing matches those filters</h4>
+                <p>Try a different category, or clear the filters to see everything on sale.</p>
                 <button type="button" className="btn-primary" onClick={resetFilters}>
                   Clear filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {visible.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

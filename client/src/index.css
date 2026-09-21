@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply font-sans text-ink;
+    @apply bg-surface font-sans text-ink;
   }
 }
 
@@ -16,37 +16,94 @@
     @apply px-5 py-10 sm:px-10 lg:px-20;
   }
 
-  /* Buttons */
-  .btn-normal {
-    @apply cursor-pointer rounded bg-white px-[30px] py-[15px] text-sm font-semibold text-black outline-none transition;
-  }
+  /* --- Buttons ------------------------------------------------------------
+     btn-primary is the orange high-attention action (add to cart, pay,
+     publish). Everything quieter uses the teal or outline variants so the
+     orange keeps its meaning. Orange carries deep-teal text, not white —
+     white on #faa327 is roughly 2:1 and unreadable. */
   .btn-primary {
-    @apply cursor-pointer rounded bg-primary px-[30px] py-[15px] text-sm font-semibold text-white outline-none transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply cursor-pointer rounded-md bg-cta px-[30px] py-[15px] text-sm font-bold text-primary-dark outline-none transition hover:bg-cta-hover focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-teal {
+    @apply cursor-pointer rounded-md bg-primary px-[30px] py-[15px] text-sm font-semibold text-white outline-none transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-outline {
+    @apply cursor-pointer rounded-md border border-primary bg-transparent px-[30px] py-[15px] text-sm font-semibold text-primary outline-none transition hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-normal {
+    @apply cursor-pointer rounded-md border border-primary-border bg-surface px-[30px] py-[15px] text-sm font-semibold text-ink outline-none transition hover:border-primary hover:text-primary;
   }
   .btn-white {
-    @apply cursor-pointer border border-white bg-transparent px-[18px] py-[11px] text-[13px] font-semibold text-white outline-none transition hover:border-primary hover:bg-primary;
+    @apply cursor-pointer rounded-md border border-white bg-transparent px-[18px] py-[11px] text-[13px] font-semibold text-white outline-none transition hover:bg-white hover:text-primary;
   }
 
-  /* Full-bleed page header / hashtag banners */
+  /* --- Page banner --------------------------------------------------------
+     A deep-teal structural band with flat geometric blocks instead of the
+     old full-bleed photography. */
   .page-banner {
-    @apply flex h-[40vh] w-full flex-col items-center justify-center bg-cover bg-center text-center text-white;
+    @apply relative flex w-full flex-col items-center justify-center overflow-hidden bg-primary px-5 py-14 text-center text-white sm:py-16;
+  }
+  .page-banner::before {
+    @apply pointer-events-none absolute -left-16 -top-16 h-56 w-56 rounded-full bg-white/[0.04] content-[''];
+  }
+  .page-banner::after {
+    @apply pointer-events-none absolute -bottom-20 -right-10 h-52 w-52 rotate-12 bg-cta/10 content-[''];
+  }
+  .page-banner > * {
+    @apply relative z-10;
   }
   .page-banner h2 {
-    @apply text-3xl font-semibold sm:text-4xl;
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
+  }
+  .page-banner p {
+    @apply mt-2 max-w-xl text-sm text-white/80 sm:text-base;
+  }
+  /* Orange rule under the banner heading — the recurring brand accent. */
+  .banner-rule {
+    @apply mx-auto mb-4 h-1 w-14 rounded-full bg-cta;
   }
 
-  /* Product card */
+  /* Small uppercase label above a heading */
+  .eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.18em] text-cta-ink;
+  }
+
+  /* --- Product card -------------------------------------------------------
+     Squared-off retail tile on white: image, then name, price, availability.
+     The old template used 25px radii and a soft editorial shadow. */
   .pro-card {
-    @apply relative cursor-pointer rounded-[25px] border border-primary-border p-3 shadow-[20px_20px_30px_rgba(0,0,0,0.02)] transition duration-200 hover:shadow-[20px_20px_30px_rgba(0,0,0,0.06)];
+    @apply relative flex cursor-pointer flex-col overflow-hidden rounded-lg border border-primary-border bg-surface transition duration-200 hover:border-primary hover:shadow-[0_8px_24px_rgba(31,82,87,0.10)];
   }
 
-  /* Form controls */
+  /* Generic content panel used by forms, summaries and tables */
+  .panel {
+    @apply rounded-lg border border-primary-border bg-surface p-6;
+  }
+
+  /* --- Form controls ------------------------------------------------------ */
   .form-input {
-    @apply w-full rounded border border-[#e1e1e1] px-[15px] py-3 text-sm outline-none focus:border-primary;
+    @apply w-full rounded-md border border-primary-border bg-surface px-[15px] py-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary;
+  }
+  .form-label {
+    @apply mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted;
   }
 
-  /* Cart-count badge on the nav bag icon */
+  /* --- Empty states ------------------------------------------------------- */
+  .empty-state {
+    @apply flex flex-col items-center rounded-lg border border-dashed border-primary-border bg-surface-2 px-6 py-14 text-center;
+  }
+  .empty-state img {
+    @apply mb-6 h-40 w-auto max-w-full sm:h-48;
+  }
+  .empty-state h4 {
+    @apply mb-2 text-lg font-bold text-primary;
+  }
+  .empty-state p {
+    @apply mb-5 max-w-md text-sm text-muted;
+  }
+
+  /* Cart-count badge on the nav bag icon — orange, the attention colour. */
   .cart-count {
-    @apply absolute -right-2.5 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-white;
+    @apply absolute -right-2.5 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cta px-1 text-[10px] font-bold leading-none text-primary-dark;
   }
 }

@@ -119,11 +119,11 @@ export default function ShopDetailsForm({
     }
   }
 
-  const labelClass = 'mb-1 block text-sm font-semibold text-muted'
+  const labelClass = 'mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted'
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-[#e1e1e1] p-6 shadow-sm" noValidate>
-      <h3 className="mb-4 text-xl font-semibold text-ink">Shop Details</h3>
+    <form onSubmit={handleSubmit} className="rounded-lg border border-primary-border bg-surface p-6" noValidate>
+      <h3 className="mb-4 text-xl font-bold text-primary">Shop details</h3>
 
       {error && <p className="mb-4 rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
 
@@ -146,10 +146,10 @@ export default function ShopDetailsForm({
         ))}
       </select>
 
-      <label className={labelClass}>About Your Store</label>
+      <label className={labelClass}>About your shop</label>
       <textarea className="form-input mb-6" rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} />
 
-      <h4 className="mb-1 border-t border-[#f0f0f0] pt-5 text-base font-semibold text-ink">Shop Address</h4>
+      <h4 className="mb-1 border-t border-primary-border pt-5 text-base font-bold text-primary">Shop address</h4>
       <p className="mb-4 text-xs text-muted-2">Buyers who pay on pickup collect their orders here.</p>
 
       <label className={labelClass}>Street Address *</label>
@@ -174,7 +174,7 @@ export default function ShopDetailsForm({
       <label className={labelClass}>Nearest Landmark</label>
       <input className="form-input mb-6" value={form.landmark} onChange={(e) => update('landmark', e.target.value)} placeholder="Opposite Ikeja City Mall" />
 
-      <h4 className="mb-1 border-t border-[#f0f0f0] pt-5 text-base font-semibold text-ink">Contact Details</h4>
+      <h4 className="mb-1 border-t border-primary-border pt-5 text-base font-bold text-primary">Contact details</h4>
       <p className="mb-4 text-xs text-muted-2">Shown to buyers on your storefront.</p>
 
       <label className={labelClass}>Business Email *</label>
@@ -203,11 +203,11 @@ export default function ShopDetailsForm({
 
       <div className="flex gap-3">
         <button type="submit" className="btn-primary" disabled={saving || uploading}>
-          {saving ? 'Saving…' : 'Save Changes'}
+          {saving ? 'Saving…' : 'Save changes'}
         </button>
         <button
           type="button"
-          className="btn-normal border border-primary-border hover:bg-primary hover:text-white"
+          className="btn-normal"
           onClick={onCancel}
           disabled={saving}
         >

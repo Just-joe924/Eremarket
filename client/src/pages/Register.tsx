@@ -41,10 +41,10 @@ export default function Register() {
     <section className="section-x flex min-h-[70vh] items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-lg border border-[#e1e1e1] p-8 shadow-sm"
+        className="w-full max-w-md rounded-lg border border-primary-border bg-surface p-8"
       >
-        <h2 className="mb-2 text-3xl text-ink">Create Account</h2>
-        <p className="mb-6 text-sm text-muted">Join Cara and start shopping.</p>
+        <h2 className="mb-2 text-3xl font-bold text-primary">Create account</h2>
+        <p className="mb-6 text-sm text-muted">Join EreMarket and order from shops near you.</p>
 
         {error && (
           <p className="mb-4 rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>
@@ -53,8 +53,9 @@ export default function Register() {
           <p className="mb-4 rounded bg-primary-soft px-3 py-2 text-sm text-primary">{notice}</p>
         )}
 
-        <label className="mb-1 block text-sm font-semibold text-muted">Full Name</label>
+        <label htmlFor="register-name" className="form-label">Full name</label>
         <input
+          id="register-name"
           type="text"
           required
           value={fullName}
@@ -63,8 +64,9 @@ export default function Register() {
           placeholder="Jane Doe"
         />
 
-        <label className="mb-1 block text-sm font-semibold text-muted">Email</label>
+        <label htmlFor="register-email" className="form-label">Email</label>
         <input
+          id="register-email"
           type="email"
           required
           value={email}
@@ -73,8 +75,9 @@ export default function Register() {
           placeholder="you@example.com"
         />
 
-        <label className="mb-1 block text-sm font-semibold text-muted">Password</label>
+        <label htmlFor="register-password" className="form-label">Password</label>
         <input
+          id="register-password"
           type="password"
           required
           value={password}
@@ -84,12 +87,12 @@ export default function Register() {
         />
 
         <button type="submit" className="btn-primary w-full" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Create Account'}
+          {submitting ? 'Creating account…' : 'Create account'}
         </button>
 
         <p className="mt-5 text-center text-sm text-muted">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-primary">
+          <Link to="/login" className="font-bold text-primary hover:underline">
             Sign in
           </Link>
         </p>

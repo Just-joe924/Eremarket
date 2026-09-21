@@ -108,8 +108,10 @@ export default function Product() {
         </div>
 
         <div className="w-full pt-2 md:w-1/2">
-          <h6 className="text-sm text-muted">Home / {product.categories?.name ?? 'Shop'}</h6>
-          <h4 className="pb-2 pt-2 text-2xl font-semibold text-ink">{product.name}</h4>
+          <h6 className="text-xs font-semibold uppercase tracking-wide text-muted-2">
+            Home / {product.categories?.name ?? 'Shop'}
+          </h6>
+          <h4 className="pb-2 pt-2 text-2xl font-bold text-ink sm:text-[28px]">{product.name}</h4>
           {product.rating && product.rating.count > 0 && (
             <a href="#reviews" className="mb-3 flex items-center gap-2 text-sm">
               <StarRating value={product.rating.average} />
@@ -119,8 +121,20 @@ export default function Product() {
               </span>
             </a>
           )}
-          <h2 className="text-[26px] font-semibold text-ink">{formatNaira(product.price)}</h2>
-          <p className={`mt-2 text-sm font-semibold ${outOfStock ? 'text-accent' : 'text-primary'}`}>
+          <h2 className="text-[30px] font-bold text-primary">{formatNaira(product.price)}</h2>
+          <p
+            className={`mt-2 inline-flex items-center gap-2 rounded px-2.5 py-1 text-sm font-bold ${
+              outOfStock
+                ? 'bg-[#fdecec] text-accent'
+                : product.stock <= 5
+                  ? 'bg-cta-soft text-cta-ink'
+                  : 'bg-primary-soft text-primary'
+            }`}
+          >
+            <i
+              className={`fa-solid ${outOfStock ? 'fa-circle-xmark' : 'fa-circle-check'}`}
+              aria-hidden="true"
+            ></i>
             {outOfStock ? 'Out of stock' : `In stock (${product.stock} available)`}
           </p>
 
@@ -139,10 +153,10 @@ export default function Product() {
                         setSizeError('')
                         setAdded(false)
                       }}
-                      className={`rounded border px-3 py-2 text-sm transition ${
+                      className={`rounded-md border px-3 py-2 text-sm font-semibold transition ${
                         size === labelText
                           ? 'border-primary bg-primary text-white'
-                          : 'border-[#e1e1e1] text-ink hover:border-primary'
+                          : 'border-primary-border text-ink hover:border-primary'
                       }`}
                     >
                       {labelText}
@@ -164,17 +178,18 @@ export default function Product() {
                 setQuantity(Math.max(1, Number(e.target.value) || 1))
                 setAdded(false)
               }}
-              className="h-[47px] w-[60px] rounded border border-[#e1e1e1] pl-2.5 text-base outline-none"
+              className="h-[47px] w-[60px] rounded-md border border-primary-border pl-2.5 text-base outline-none focus:border-primary"
+              aria-label="Quantity"
             />
             <button className="btn-primary" onClick={handleAddToCart} disabled={outOfStock}>
               {added ? 'Added to cart ✓' : 'Add to cart'}
             </button>
             <button
               onClick={handleWishlist}
-              className={`flex h-[47px] w-[47px] items-center justify-center rounded border transition ${
+              className={`flex h-[47px] w-[47px] items-center justify-center rounded-md border transition ${
                 wishlisted
                   ? 'border-accent bg-accent text-white'
-                  : 'border-[#e1e1e1] text-muted-2 hover:border-accent hover:text-accent'
+                  : 'border-primary-border text-muted-2 hover:border-accent hover:text-accent'
               }`}
               aria-label="Toggle wishlist"
             >
@@ -182,7 +197,9 @@ export default function Product() {
             </button>
           </div>
 
-          <h4 className="pb-2.5 pt-10 text-xl font-semibold text-ink">Product Details</h4>
+          <h4 className="mb-3 mt-10 border-t border-primary-border pt-6 text-lg font-bold text-primary">
+            Product details
+          </h4>
           <span className="leading-relaxed text-muted">{product.description}</span>
         </div>
       </section>
@@ -192,17 +209,19 @@ export default function Product() {
       </div>
 
       {related.length > 0 && (
-        <section className="section-x text-center">
-          <h2 className="text-3xl text-ink sm:text-[46px]">You May Also Like</h2>
-          <p className="text-muted">Summer Collection New Modern Design</p>
-          <div className="grid grid-cols-1 gap-7 pt-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="section-x bg-surface-2">
+          <p className="eyebrow">Same aisle</p>
+          <h2 className="mt-1 text-2xl font-bold text-primary sm:text-[32px]">
+            Others also stock these
+          </h2>
+          <div className="grid grid-cols-1 gap-5 pt-5 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
-          <div className="mt-5">
-            <button className="btn-primary" onClick={() => navigate('/cart')}>
-              View Cart
+          <div className="mt-6">
+            <button className="btn-outline" onClick={() => navigate('/cart')}>
+              View cart
             </button>
           </div>
         </section>

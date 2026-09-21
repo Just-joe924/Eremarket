@@ -139,28 +139,29 @@ export default function SellerOnboarding() {
     )
   }
 
-  const labelClass = 'mb-1 block text-sm font-semibold text-muted'
+  const labelClass = 'mb-1.5 block text-xs font-bold uppercase tracking-wide text-muted'
 
   return (
     <>
-      <section className="page-banner bg-about-header [background-position:top_25%_right_0]">
-        <h2>#StartSelling</h2>
-        <p className="text-white">Set up your store and reach Cara shoppers</p>
+      <section className="page-banner">
+        <div className="banner-rule" />
+        <h2>Start selling</h2>
+        <p>Set up your storefront and reach buyers shopping EreMarket near you.</p>
       </section>
 
-      <section className="section-x flex justify-center">
-        <form onSubmit={handleSubmit} className="w-full max-w-xl rounded-lg border border-[#e1e1e1] p-8 shadow-sm" noValidate>
-          <h2 className="mb-2 text-3xl text-ink">Become a Seller</h2>
+      <section className="section-x flex justify-center bg-surface-2">
+        <form onSubmit={handleSubmit} className="w-full max-w-xl rounded-lg border border-primary-border bg-surface p-8" noValidate>
+          <h2 className="mb-2 text-3xl font-bold text-primary">Become a merchant</h2>
           <p className="mb-6 text-sm text-muted">Tell buyers about your business and where to find you.</p>
 
           {error && <p className="mb-4 rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
 
           {/* --- Business --- */}
           <label className={labelClass}>Business Name *</label>
-          <input className="form-input mb-4" value={form.business_name} onChange={(e) => update('business_name', e.target.value)} placeholder="Acme Apparel Co." />
+          <input className="form-input mb-4" value={form.business_name} onChange={(e) => update('business_name', e.target.value)} placeholder="Adebayo Stores Ltd" />
 
           <label className={labelClass}>Brand Name</label>
-          <input className="form-input mb-1" value={form.brand_name} onChange={(e) => update('brand_name', e.target.value)} placeholder="Acme" />
+          <input className="form-input mb-1" value={form.brand_name} onChange={(e) => update('brand_name', e.target.value)} placeholder="Adebayo Stores" />
           <p className="mb-4 text-xs text-muted-2">Buyers can find your products by searching this brand.</p>
 
           <label className={labelClass}>Business Type</label>
@@ -171,11 +172,11 @@ export default function SellerOnboarding() {
             ))}
           </select>
 
-          <label className={labelClass}>About Your Store</label>
-          <textarea className="form-input mb-6" rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="What makes your brand special?" />
+          <label className={labelClass}>About your shop</label>
+          <textarea className="form-input mb-6" rows={3} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="What do you stock, and who do you sell to?" />
 
           {/* --- Shop address --- */}
-          <h3 className="mb-1 border-t border-[#f0f0f0] pt-6 text-lg font-semibold text-ink">Shop Address</h3>
+          <h3 className="mb-1 border-t border-primary-border pt-6 text-lg font-bold text-primary">Shop address</h3>
           <p className="mb-4 text-xs text-muted-2">
             Buyers who choose <strong>pay on pickup</strong> collect their orders here, so make it easy to find.
           </p>
@@ -204,11 +205,11 @@ export default function SellerOnboarding() {
           <p className="mb-6 text-xs text-muted-2">Optional, but it's how people actually find you.</p>
 
           {/* --- Contact --- */}
-          <h3 className="mb-1 border-t border-[#f0f0f0] pt-6 text-lg font-semibold text-ink">Contact Details</h3>
+          <h3 className="mb-1 border-t border-primary-border pt-6 text-lg font-bold text-primary">Contact details</h3>
           <p className="mb-4 text-xs text-muted-2">We use these to reach you about orders. Buyers see them on your storefront.</p>
 
           <label className={labelClass}>Business Email *</label>
-          <input type="email" className="form-input mb-4" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="sales@acme.ng" />
+          <input type="email" className="form-input mb-4" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="sales@yourshop.ng" />
 
           <div className="flex gap-4">
             <div className="mb-4 flex-1">
@@ -232,7 +233,7 @@ export default function SellerOnboarding() {
           </div>
 
           <button type="submit" className="btn-primary w-full" disabled={submitting || uploading}>
-            {submitting ? 'Creating your store…' : 'Create Store'}
+            {submitting ? 'Creating your storefront…' : 'Create storefront'}
           </button>
         </form>
       </section>

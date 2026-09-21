@@ -47,9 +47,10 @@ export default function SellerStorefront() {
 
   return (
     <>
-      <section className="page-banner bg-about-header [background-position:top_25%_right_0]">
+      <section className="page-banner">
+        <div className="banner-rule" />
         <h2>{seller.brand_name || seller.business_name}</h2>
-        {seller.business_type && <p className="text-white">{seller.business_type}</p>}
+        {seller.business_type && <p>{seller.business_type}</p>}
       </section>
 
       <section className="section-x">
@@ -58,7 +59,7 @@ export default function SellerStorefront() {
             <img src={seller.logo_url} alt={seller.business_name} className="h-20 w-20 rounded-full object-cover" />
           )}
           <div>
-            <h2 className="text-2xl font-semibold text-ink">{seller.business_name}</h2>
+            <h2 className="text-2xl font-bold text-primary">{seller.business_name}</h2>
             {seller.description && <p className="mt-1 max-w-2xl text-sm text-muted">{seller.description}</p>}
             {seller.website && (
               <a href={seller.website} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-semibold text-primary">
@@ -69,7 +70,7 @@ export default function SellerStorefront() {
         </div>
 
         {(seller.address_line || seller.phone || seller.email) && (
-          <div className="mb-8 grid gap-4 rounded-md border border-[#e2e9e1] p-5 sm:grid-cols-2">
+          <div className="mb-8 grid gap-4 rounded-lg border border-primary-border bg-surface-2 p-5 sm:grid-cols-2">
             {seller.address_line && (
               <div className="flex items-start gap-3">
                 <i className="fa-solid fa-location-dot mt-1 text-primary"></i>
@@ -107,9 +108,16 @@ export default function SellerStorefront() {
         )}
 
         {products.length === 0 ? (
-          <p className="py-12 text-center text-muted">This store has no products yet.</p>
+          <div className="empty-state">
+            <img src="/assets/images/empty-catalog.svg" alt="" aria-hidden="true" />
+            <h4>Nothing listed yet</h4>
+            <p>This merchant hasn't published any products. Check back shortly.</p>
+            <Link to="/shop">
+              <button className="btn-primary">Browse other shops</button>
+            </Link>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

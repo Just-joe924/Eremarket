@@ -1,46 +1,51 @@
 import type { BlogPost } from '../types'
 
-// Each excerpt is written to the photo beside it — if you swap an image, rewrite
-// the copy with it.
+// Typography-first cards — there is no artwork per post, so the category label
+// and the excerpt carry the whole card. Keep excerpts to two or three lines.
 export const blogPosts: BlogPost[] = [
   {
     id: 1,
-    title: 'Sheer, Styled Simply',
+    title: 'Counting stock once a week beats counting it never',
     excerpt:
-      'A black chiffon top with a tie-back opening does all the work on its own — the detail sits at the nape, so the back becomes the feature. Keep hair off the neck, skip the necklace, and let the fabric do the talking.',
-    image: '/img/blog/b1.jpg',
-    date: '13/01',
+      'Most shops around Ojodu find out an item finished when a customer asks for it. A ten-minute Friday count, entered straight into your storefront, keeps listings honest and stops the calls you cannot fulfil.',
+    category: 'Inventory',
+    date: '14 Mar',
+    readMinutes: 4,
   },
   {
     id: 2,
-    title: 'Black and Camel, Nothing Else',
+    title: 'Pricing in naira when your supplier prices in dollars',
     excerpt:
-      'Two colours are enough for a full wardrobe. A sharp black jacket next to a soft camel blouse reads considered rather than plain, and every piece you own suddenly works with every other one.',
-    image: '/img/blog/b2.jpg',
-    date: '13/04',
+      'Rates move faster than your shelves do. Here is how merchants on EreMarket set a margin that survives a jump, review it on a schedule instead of per customer, and avoid repricing the whole catalogue every week.',
+    category: 'Pricing',
+    date: '02 Mar',
+    readMinutes: 5,
   },
   {
     id: 3,
-    title: 'Inside the Shops on Cara',
+    title: 'Why reserve-and-collect wins in a cash market',
     excerpt:
-      'Behind every listing is a real shop with real rails — folded knits on the table, the season hanging in colour order. Choose pay-on-pickup at checkout and you walk in, see it in person, and pay at the counter.',
-    image: '/img/blog/b3.jpg',
-    date: '12/01',
+      'Plenty of buyers will not send money to a shop they have never entered. Letting them hold the item online and pay at your counter removes the risk on both sides — and they almost always buy something else while there.',
+    category: 'Payments',
+    date: '19 Feb',
+    readMinutes: 3,
   },
   {
     id: 4,
-    title: 'Grey-on-Grey, Off Duty',
+    title: 'Photographing products on a phone, on a counter',
     excerpt:
-      'Soft marl knits over cuffed joggers, finished with chunky sandals — the outfit you can actually move in. It is the easiest way to look put together on a day you are not trying to.',
-    image: '/img/blog/b4.jpg',
-    date: '16/01',
+      'No studio, no lightbox. Face a window, clear the background, shoot straight on, and fill the frame. Consistent photos across a catalogue read as a real business faster than any single polished shot.',
+    category: 'Merchandising',
+    date: '05 Feb',
+    readMinutes: 4,
   },
   {
     id: 5,
-    title: 'Dressing for Harmattan',
+    title: 'Buying by the carton: what wholesale buyers expect',
     excerpt:
-      'The season turns dry, the mornings turn cold, and the heavy knit finally earns its place. Layer a chunky sleeve over something light, keep a warm drink close, and let the dust settle.',
-    image: '/img/blog/b6.jpg',
-    date: '10/03',
+      'Caterers, kiosks and small retailers restocking in volume look for unit price, case quantity and how soon you can fill the order. List those three things and the enquiries turn into orders.',
+    category: 'Wholesale',
+    date: '21 Jan',
+    readMinutes: 6,
   },
 ]

@@ -1,5 +1,5 @@
 /**
- * Cara's own contact details, shown in the footer and on the contact page.
+ * EreMarket's own contact details, shown in the footer and on the contact page.
  * Edit here and both places update.
  */
 export const SITE_CONTACT = {

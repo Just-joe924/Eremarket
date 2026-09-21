@@ -180,7 +180,7 @@ export default function ProductForm({
   const label = 'mb-1 block text-sm font-semibold text-muted'
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-[#e1e1e1] p-6">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-primary-border bg-surface p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-ink">{isEdit ? 'Edit Product' : 'Add Product'}</h3>
         <button type="button" onClick={onCancel} className="text-sm text-muted-2 hover:text-accent">
@@ -229,13 +229,13 @@ export default function ProductForm({
         </label>
       </div>
       <p className="mb-4 text-xs text-muted-2">
-        Add <strong>at least 2 photos</strong> so buyers can see the product from different angles and
-        variations (e.g. colors). The image marked <strong>Main</strong> is the cover shown on listings —
+        Add <strong>at least 2 photos</strong> so buyers can see the product clearly — the label, the
+        pack size, the shelf. The image marked <strong>Main</strong> is the cover shown on listings;
         hover another to set it as the cover.
       </p>
 
       <label className={label}>Name *</label>
-      <input className="form-input mb-4" value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder="Men's Cotton Polo Shirt" />
+      <input className="form-input mb-4" value={name} onChange={(e) => handleNameChange(e.target.value)} placeholder="Golden Penny Semovita 2kg" />
 
       <div className="flex flex-wrap gap-4">
         <div className="mb-4 min-w-[240px] flex-1">
@@ -271,7 +271,7 @@ export default function ProductForm({
         </div>
         <div className="mb-4 w-36">
           <label className={label}>Price (₦) *</label>
-          <input type="number" min={0} step="1" className="form-input" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="12500" />
+          <input type="number" min={0} step="1" className="form-input" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="4500" />
         </div>
         <div className="mb-4 w-24">
           <label className={label}>Stock</label>
@@ -294,14 +294,14 @@ export default function ProductForm({
             </button>
           </div>
         ))}
-        <button type="button" onClick={addSize} className="text-sm font-semibold text-primary">
+        <button type="button" onClick={addSize} className="text-sm font-bold text-primary hover:underline">
           <i className="fa-solid fa-plus mr-1"></i> Add size
         </button>
       </div>
 
       {/* Description helper */}
-      <div className="mb-4 rounded border border-primary-border bg-primary-soft/40 p-4">
-        <p className="mb-2 text-sm font-semibold text-ink">Auto-generate a description</p>
+      <div className="mb-4 rounded-md border border-primary-border bg-primary-soft p-4">
+        <p className="mb-2 text-sm font-bold text-primary">Auto-generate a description</p>
         <div className="flex flex-wrap gap-3">
           <input className="form-input flex-1" value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="Condition (e.g. brand-new, premium)" />
           <input className="form-input flex-1" value={features} onChange={(e) => setFeatures(e.target.value)} placeholder="Key features, comma-separated" />
@@ -321,9 +321,9 @@ export default function ProductForm({
 
       <div className="flex gap-3">
         <button type="submit" className="btn-primary" disabled={saving || uploading}>
-          {saving ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Product'}
+          {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Publish product'}
         </button>
-        <button type="button" onClick={onCancel} className="btn-normal border border-primary-border hover:bg-primary hover:text-white">
+        <button type="button" onClick={onCancel} className="btn-normal">
           Cancel
         </button>
       </div>

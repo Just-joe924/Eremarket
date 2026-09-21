@@ -53,8 +53,10 @@ export default function CheckoutSuccess() {
 
       {status === 'paid' && (
         <>
-          <i className="fa-solid fa-circle-check text-[64px] text-primary"></i>
-          <h2 className="mt-5 text-3xl text-ink">Payment successful!</h2>
+          <span className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-soft">
+            <i className="fa-solid fa-circle-check text-[44px] text-primary"></i>
+          </span>
+          <h2 className="mt-5 text-3xl font-bold text-primary">Payment successful</h2>
           <p className="my-3 text-muted">
             {orderId && (
               <>
@@ -65,12 +67,10 @@ export default function CheckoutSuccess() {
           </p>
           <div className="mt-3 flex flex-wrap justify-center gap-3">
             <Link to="/account">
-              <button className="btn-primary">View My Orders</button>
+              <button className="btn-primary">View my orders</button>
             </Link>
             <Link to="/shop">
-              <button className="btn-normal border border-primary-border hover:bg-primary hover:text-white">
-                Continue Shopping
-              </button>
+              <button className="btn-outline">Continue shopping</button>
             </Link>
           </div>
         </>
@@ -78,13 +78,15 @@ export default function CheckoutSuccess() {
 
       {status === 'unpaid' && (
         <>
-          <i className="fa-solid fa-clock text-[64px] text-star"></i>
-          <h2 className="mt-5 text-3xl text-ink">Payment pending</h2>
+          <span className="flex h-20 w-20 items-center justify-center rounded-full bg-cta-soft">
+            <i className="fa-solid fa-clock text-[44px] text-cta-ink"></i>
+          </span>
+          <h2 className="mt-5 text-3xl font-bold text-ink">Payment pending</h2>
           <p className="my-3 text-muted">
             Your payment hasn't completed yet. If you were charged, your order will update shortly.
           </p>
           <Link to="/account">
-            <button className="btn-primary">Go to My Orders</button>
+            <button className="btn-primary">Go to my orders</button>
           </Link>
         </>
       )}
@@ -92,10 +94,10 @@ export default function CheckoutSuccess() {
       {status === 'error' && (
         <>
           <i className="fa-solid fa-circle-exclamation text-[64px] text-accent"></i>
-          <h2 className="mt-5 text-3xl text-ink">Something went wrong</h2>
+          <h2 className="mt-5 text-3xl font-bold text-ink">Something went wrong</h2>
           <p className="my-3 text-muted">{message}</p>
           <Link to="/cart">
-            <button className="btn-primary">Back to Cart</button>
+            <button className="btn-primary">Back to cart</button>
           </Link>
         </>
       )}

@@ -31,17 +31,18 @@ export default function Login() {
     <section className="section-x flex min-h-[70vh] items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-lg border border-[#e1e1e1] p-8 shadow-sm"
+        className="w-full max-w-md rounded-lg border border-primary-border bg-surface p-8"
       >
-        <h2 className="mb-2 text-3xl text-ink">Sign In</h2>
-        <p className="mb-6 text-sm text-muted">Welcome back to Cara.</p>
+        <h2 className="mb-2 text-3xl font-bold text-primary">Sign in</h2>
+        <p className="mb-6 text-sm text-muted">Welcome back to EreMarket.</p>
 
         {error && (
           <p className="mb-4 rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>
         )}
 
-        <label className="mb-1 block text-sm font-semibold text-muted">Email</label>
+        <label htmlFor="login-email" className="form-label">Email</label>
         <input
+          id="login-email"
           type="email"
           required
           value={email}
@@ -50,8 +51,9 @@ export default function Login() {
           placeholder="you@example.com"
         />
 
-        <label className="mb-1 block text-sm font-semibold text-muted">Password</label>
+        <label htmlFor="login-password" className="form-label">Password</label>
         <input
+          id="login-password"
           type="password"
           required
           value={password}
@@ -61,12 +63,12 @@ export default function Login() {
         />
 
         <button type="submit" className="btn-primary w-full" disabled={submitting}>
-          {submitting ? 'Signing in…' : 'Sign In'}
+          {submitting ? 'Signing in…' : 'Sign in'}
         </button>
 
         <p className="mt-5 text-center text-sm text-muted">
           Don't have an account?{' '}
-          <Link to="/register" className="font-semibold text-primary">
+          <Link to="/register" className="font-bold text-primary hover:underline">
             Create one
           </Link>
         </p>

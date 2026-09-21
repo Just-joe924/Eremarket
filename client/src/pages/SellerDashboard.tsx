@@ -73,17 +73,18 @@ export default function SellerDashboard() {
 
   return (
     <>
-      <section className="page-banner bg-shop-header [background-position:top_25%_right_0]">
+      <section className="page-banner">
+        <div className="banner-rule" />
         <h2>{seller.brand_name || seller.business_name}</h2>
-        <p className="text-white">Seller Dashboard</p>
+        <p>Merchant dashboard — inventory, orders and shop details.</p>
       </section>
 
-      <section className="section-x">
+      <section className="section-x bg-surface-2">
         {/* Sellers who onboarded before shop addresses existed have none on file,
             and buyers choosing pay-on-pickup have nowhere to go. */}
         {!seller.address_line && !shopFormOpen && (
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border-l-[3px] border-[#b26a00] bg-[#fff8ec] px-4 py-3">
-            <p className="text-sm text-[#b26a00]">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border-l-[4px] border-cta bg-cta-soft px-4 py-3">
+            <p className="text-sm font-semibold text-cta-ink">
               <i className="fa-solid fa-triangle-exclamation mr-2"></i>
               Your shop has no address yet — buyers who choose <strong>pay on pickup</strong> won't
               know where to collect.
@@ -94,23 +95,23 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg bg-primary px-6 py-5">
           <div>
-            <h2 className="text-2xl font-semibold text-ink">Your Products</h2>
-            <p className="text-sm text-muted">
+            <h2 className="text-2xl font-bold text-white">Inventory</h2>
+            <p className="text-sm text-white/75">
               {products.length} product{products.length === 1 ? '' : 's'} ·{' '}
-              <Link to="/seller/orders" className="font-semibold text-primary">
+              <Link to="/seller/orders" className="font-bold text-cta hover:underline">
                 Orders
               </Link>{' '}
               ·{' '}
-              <Link to={`/store/${seller.id}`} className="font-semibold text-primary">
+              <Link to={`/store/${seller.id}`} className="font-bold text-cta hover:underline">
                 View your storefront
               </Link>{' '}
               ·{' '}
               <button
                 type="button"
                 onClick={() => setShopFormOpen((open) => !open)}
-                className="font-semibold text-primary hover:underline"
+                className="font-bold text-cta hover:underline"
               >
                 Shop details
               </button>
@@ -118,7 +119,7 @@ export default function SellerDashboard() {
           </div>
           {!formOpen && (
             <button className="btn-primary" onClick={openAdd}>
-              <i className="fa-solid fa-plus mr-2"></i> Add Product
+              <i className="fa-solid fa-plus mr-2"></i> Add product
             </button>
           )}
         </div>
@@ -155,49 +156,62 @@ export default function SellerDashboard() {
         )}
 
         {products.length === 0 && !formOpen ? (
-          <div className="rounded-lg border border-dashed border-primary-border py-16 text-center">
-            <i className="fa-solid fa-box-open mb-4 text-4xl text-primary-border"></i>
-            <h4 className="mb-2 text-lg">No products yet</h4>
-            <p className="mb-4 text-sm text-muted">Add your first product to start selling.</p>
-            <button className="btn-primary" onClick={openAdd}>Add Product</button>
+          <div className="empty-state">
+            <img src="/assets/images/empty-catalog.svg" alt="" aria-hidden="true" />
+            <h4>No products yet</h4>
+            <p>Add your first product and it goes live on the marketplace straight away.</p>
+            <button className="btn-primary" onClick={openAdd}>Add product</button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-primary-border bg-surface">
             <table className="w-full border-collapse text-sm">
-              <thead className="border-y border-header">
-                <tr className="text-left text-xs font-bold uppercase text-ink">
-                  <th className="py-3">Product</th>
-                  <th className="py-3">Price</th>
-                  <th className="py-3">Stock</th>
-                  <th className="py-3">Status</th>
-                  <th className="py-3 text-right">Actions</th>
+              <thead className="bg-primary text-white">
+                <tr className="text-left text-xs font-bold uppercase tracking-wide">
+                  <th className="px-4 py-3">Product</th>
+                  <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3">Stock</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((p) => (
-                  <tr key={p.id} className="border-b border-[#f0f0f0]">
-                    <td className="py-3">
+                  <tr key={p.id} className="border-b border-primary-border last:border-0">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
                           src={p.image_url ?? 'https://placehold.co/48x48?text=No+Img'}
                           alt={p.name}
-                          className="h-12 w-12 rounded object-cover"
+                          className="h-12 w-12 rounded border border-primary-border object-cover"
                         />
-                        <span className="font-medium text-ink">{p.name}</span>
+                        <span className="font-semibold text-ink">{p.name}</span>
                       </div>
                     </td>
-                    <td className="py-3">{formatNaira(p.price)}</td>
-                    <td className="py-3">{p.stock}</td>
-                    <td className="py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${p.is_active ? 'bg-primary-soft text-primary' : 'bg-[#f0f0f0] text-muted-2'}`}>
+                    <td className="px-4 py-3 font-semibold text-primary">{formatNaira(p.price)}</td>
+                    <td className="px-4 py-3">
+                      {/* Orange flags a stock level the merchant needs to act on. */}
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs font-bold ${
+                          p.stock <= 0
+                            ? 'bg-[#fdecec] text-accent'
+                            : p.stock <= 5
+                              ? 'bg-cta-soft text-cta-ink'
+                              : 'text-muted'
+                        }`}
+                      >
+                        {p.stock <= 0 ? 'Out of stock' : p.stock}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${p.is_active ? 'bg-primary-soft text-primary' : 'bg-surface-2 text-muted-2'}`}>
                         {p.is_active ? 'Live' : 'Draft'}
                       </span>
                     </td>
-                    <td className="py-3 text-right">
-                      <button onClick={() => openEdit(p)} className="mr-4 font-semibold text-primary hover:underline">
+                    <td className="px-4 py-3 text-right">
+                      <button onClick={() => openEdit(p)} className="mr-4 font-bold text-primary hover:underline">
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(p)} className="font-semibold text-accent hover:underline">
+                      <button onClick={() => handleDelete(p)} className="font-bold text-accent hover:underline">
                         Delete
                       </button>
                     </td>

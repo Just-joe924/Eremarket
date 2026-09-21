@@ -102,7 +102,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
   }
 
   return (
-    <section className="section-x border-t border-[#f0f0f0]">
+    <section className="section-x border-t border-primary-border bg-surface-2">
       <h2 className="mb-6 text-2xl font-semibold text-ink">Ratings & Reviews</h2>
 
       {loading ? (
@@ -113,7 +113,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
         <div className="flex flex-col gap-10 lg:flex-row">
           {/* Summary + write */}
           <div className="lg:w-1/3">
-            <div className="rounded-xl border border-[#e6eaf0] p-5">
+            <div className="rounded-lg border border-primary-border bg-surface p-5">
               <div className="flex items-end gap-3">
                 <span className="text-4xl font-bold text-ink">{summary.avg.toFixed(1)}</span>
                 <div className="pb-1">
@@ -130,9 +130,9 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                     return (
                       <div key={star} className="flex items-center gap-2 text-xs text-muted">
                         <span className="w-3">{star}</span>
-                        <i className="fa-solid fa-star text-[10px] text-[#f5a623]"></i>
-                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#eef1f5]">
-                          <div className="h-full rounded-full bg-[#f5a623]" style={{ width: `${pct}%` }}></div>
+                        <i className="fa-solid fa-star text-[10px] text-star"></i>
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-2">
+                          <div className="h-full rounded-full bg-star" style={{ width: `${pct}%` }}></div>
                         </div>
                         <span className="w-6 text-right">{n}</span>
                       </div>
@@ -144,7 +144,7 @@ export default function ReviewsSection({ productId }: { productId: string }) {
               <div className="mt-5">
                 {!user ? (
                   <p className="text-sm text-muted">
-                    <Link to="/login" className="font-semibold text-primary">Sign in</Link> to write a review.
+                    <Link to="/login" className="font-bold text-primary hover:underline">Sign in</Link> to write a review.
                   </p>
                 ) : editing ? (
                   <div className="space-y-3">
@@ -154,27 +154,25 @@ export default function ReviewsSection({ productId }: { productId: string }) {
                       onChange={(e) => setComment(e.target.value)}
                       placeholder="Share your thoughts (optional)…"
                       rows={4}
-                      className="w-full rounded border border-[#e1e1e1] px-3 py-2 text-sm outline-none focus:border-primary"
+                      aria-label="Your review"
+                      className="w-full rounded-md border border-primary-border px-3 py-2 text-sm outline-none focus:border-primary"
                     />
                     {error && <p className="text-xs text-accent">{error}</p>}
                     <div className="flex gap-2">
                       <button className="btn-primary" onClick={submit} disabled={submitting}>
                         {submitting ? 'Saving…' : myReview ? 'Update review' : 'Submit review'}
                       </button>
-                      <button
-                        className="btn-normal border border-primary-border hover:bg-primary hover:text-white"
-                        onClick={() => setEditing(false)}
-                      >
+                      <button className="btn-normal" onClick={() => setEditing(false)}>
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : myReview ? (
                   <div className="flex gap-3 text-sm">
-                    <button className="font-semibold text-primary hover:underline" onClick={startWriting}>
+                    <button className="font-bold text-primary hover:underline" onClick={startWriting}>
                       Edit your review
                     </button>
-                    <button className="font-semibold text-accent hover:underline" onClick={removeMine}>
+                    <button className="font-bold text-accent hover:underline" onClick={removeMine}>
                       Delete
                     </button>
                   </div>
@@ -190,14 +188,15 @@ export default function ReviewsSection({ productId }: { productId: string }) {
           {/* Review list */}
           <div className="flex-1">
             {reviews.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-primary-border py-14 text-center">
+              <div className="rounded-lg border border-dashed border-primary-border bg-surface-2 py-14 text-center">
                 <i className="fa-regular fa-star mb-3 text-4xl text-primary-border"></i>
-                <p className="text-muted">No reviews yet. Be the first to review this product.</p>
+                <p className="font-semibold text-primary">No reviews yet</p>
+                <p className="mt-1 text-sm text-muted">Be the first to review this product.</p>
               </div>
             ) : (
               <ul className="space-y-5">
                 {reviews.map((r) => (
-                  <li key={r.id} className="border-b border-[#f0f0f0] pb-5 last:border-0">
+                  <li key={r.id} className="border-b border-primary-border pb-5 last:border-0">
                     <div className="mb-1 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-ink">{r.author_name || 'Anonymous'}</span>

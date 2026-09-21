@@ -46,13 +46,13 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0f1720] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-primary-dark px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft">
             <i className="fa-solid fa-shield-halved text-xl text-primary"></i>
           </div>
-          <h1 className="text-xl font-semibold text-ink">Cara Admin</h1>
+          <h1 className="text-xl font-bold text-primary">EreMarket Admin</h1>
           <p className="text-sm text-muted">Restricted access</p>
         </div>
 
@@ -62,7 +62,8 @@ export default function AdminLogin() {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded border border-[#e1e1e1] px-[15px] py-3 text-sm outline-none focus:border-primary"
+            className="form-input"
+            aria-label="Email address"
             autoComplete="username"
           />
           <input
@@ -70,7 +71,8 @@ export default function AdminLogin() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded border border-[#e1e1e1] px-[15px] py-3 text-sm outline-none focus:border-primary"
+            className="form-input"
+            aria-label="Password"
             autoComplete="current-password"
           />
           {error && <p className="rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
