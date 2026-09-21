@@ -21,12 +21,12 @@ export const env = {
   // Paystack — NGN payments (cards, bank transfer, USSD).
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY || '',
   RESEND_API_KEY: process.env.RESEND_API_KEY || '',
-  EMAIL_FROM: process.env.EMAIL_FROM || 'Cara <onboarding@resend.dev>',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'EreMarket <onboarding@resend.dev>',
   /** Inbox that contact-form submissions are forwarded to. */
   CONTACT_EMAIL_TO: process.env.CONTACT_EMAIL_TO || '',
   /**
    * Absolute URL of the logo shown in emails. Must be publicly reachable —
    * a localhost URL will render as a broken image in real inboxes.
    */
-  LOGO_URL: process.env.LOGO_URL || `${CLIENT_ORIGIN}/img/logo.png`,
+  LOGO_URL: process.env.LOGO_URL || `${CLIENT_ORIGIN}/assets/brand/logo-eremarket-on-teal.png`,
 }

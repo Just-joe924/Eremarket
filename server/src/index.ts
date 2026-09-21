@@ -39,5 +39,5 @@ app.use((_req, res) => {
 })
 
 app.listen(env.PORT, () => {
-  console.log(`Cara API listening on http://localhost:${env.PORT}`)
+  console.log(`EreMarket API listening on http://localhost:${env.PORT}`)
 })

@@ -63,7 +63,9 @@ async function sendEmail(
 
 // --- shared presentation ---------------------------------------------------
 
-const BRAND = '#088178'
+const BRAND = '#1f5257' // EreMarket deep teal
+const CTA = '#faa327' // EreMarket orange — action buttons only
+const CTA_INK = '#153c40' // readable text colour on CTA orange
 const INK = '#1a1a1a'
 const MUTED = '#6b7280'
 const LINE = '#e6eaf0'
@@ -95,7 +97,7 @@ interface LayoutOptions {
 }
 
 /**
- * The shared email shell: Cara wordmark on white, a teal accent rule, then the
+ * The shared email shell: EreMarket wordmark on white, a teal accent rule, then the
  * content. Table-based and inline-styled because that is what Outlook and the
  * Gmail app actually render.
  */
@@ -111,7 +113,7 @@ function layout(o: LayoutOptions): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid ${LINE};border-radius:14px;overflow:hidden;">
             <tr>
               <td style="padding:26px 32px 18px;border-bottom:3px solid ${BRAND};">
-                <img src="${esc(env.LOGO_URL)}" alt="Cara" height="30" style="display:block;height:30px;border:0;outline:none;text-decoration:none;">
+                <img src="${esc(env.LOGO_URL)}" alt="EreMarket" height="30" style="display:block;height:30px;border:0;outline:none;text-decoration:none;">
               </td>
             </tr>
             <tr>
@@ -122,8 +124,8 @@ function layout(o: LayoutOptions): string {
                 ${
                   o.cta
                     ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:26px;">
-                         <tr><td style="border-radius:8px;background:${BRAND};">
-                           <a href="${esc(o.cta.url)}" style="display:inline-block;padding:13px 26px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;">${esc(o.cta.label)}</a>
+                         <tr><td style="border-radius:8px;background:${CTA};">
+                           <a href="${esc(o.cta.url)}" style="display:inline-block;padding:13px 26px;color:${CTA_INK};font-size:15px;font-weight:700;text-decoration:none;">${esc(o.cta.label)}</a>
                          </td></tr>
                        </table>`
                     : ''
@@ -133,7 +135,7 @@ function layout(o: LayoutOptions): string {
             <tr>
               <td style="padding:18px 32px 22px;border-top:1px solid #f1f3f6;background:#fafbfc;color:#9099a8;font-size:12px;line-height:1.6;">
                 ${esc(o.footerNote)}<br>
-                <a href="${esc(env.CLIENT_ORIGIN)}" style="color:${BRAND};text-decoration:none;">Cara Marketplace</a>
+                <a href="${esc(env.CLIENT_ORIGIN)}" style="color:${BRAND};text-decoration:none;">EreMarket</a>
               </td>
             </tr>
           </table>
@@ -214,7 +216,7 @@ function pickupLocationsHtml(sellers: ReceiptSeller[]): string {
       </div>`
     })
     .join('')
-  return `<div style="margin-top:22px;padding:16px 18px;background:#f0f9f7;border-left:3px solid ${BRAND};border-radius:6px;font-size:14px;">
+  return `<div style="margin-top:22px;padding:16px 18px;background:#e7efef;border-left:3px solid ${BRAND};border-radius:6px;font-size:14px;">
     <strong style="color:${INK};">Where to collect</strong>${blocks}
   </div>`
 }
@@ -307,8 +309,8 @@ export function buildOrderReceipt(order: ReceiptOrder, buyerName: string): { sub
 
   return {
     subject: payOnPickup
-      ? `Cara order #${ref} — reserved for pickup`
-      : `Your Cara receipt — order #${ref}`,
+      ? `EreMarket order #${ref} — reserved for pickup`
+      : `Your EreMarket receipt — order #${ref}`,
     html: layout({
       preheader: payOnPickup
         ? `Order #${ref} is reserved. Pay ${formatNaira(Number(order.total_amount))} when you collect.`
@@ -317,7 +319,7 @@ export function buildOrderReceipt(order: ReceiptOrder, buyerName: string): { sub
       subheading: `Order #${ref} · ${placed}`,
       bodyHtml: body,
       cta: { label: 'Track your order', url: `${env.CLIENT_ORIGIN}/account` },
-      footerNote: "You're receiving this because you placed an order on Cara.",
+      footerNote: "You're receiving this because you placed an order on EreMarket.",
     }),
   }
 }
@@ -377,13 +379,13 @@ export async function sendItemStatusEmail(orderItemId: string, status: string): 
       : `<p style="margin:0;">Good news, ${esc(name)} — your <strong>${esc(productName)}</strong> is on its way.</p>`
     await sendEmail(
       email,
-      isPickup ? 'Your Cara order is ready for pickup 🛍️' : 'Your Cara item has shipped 📦',
+      isPickup ? 'Your EreMarket order is ready for pickup 🛍️' : 'Your EreMarket item has shipped 📦',
       layout({
         preheader: isPickup ? `${productName} is ready to collect.` : `${productName} is on its way.`,
         heading: isPickup ? 'Ready for collection' : 'Your order is on its way',
         bodyHtml: body,
         cta: { label: 'View order', url: `${env.CLIENT_ORIGIN}/account` },
-        footerNote: "You're receiving this because you placed an order on Cara.",
+        footerNote: "You're receiving this because you placed an order on EreMarket.",
       }),
     )
     return
@@ -392,16 +394,16 @@ export async function sendItemStatusEmail(orderItemId: string, status: string): 
   // delivered → ask for a review
   const body = `
     <p style="margin:0 0 14px;">Hi ${esc(name)}, your <strong>${esc(productName)}</strong> is with you. We'd love to hear what you think!</p>
-    <p style="margin:0;">A quick rating helps other shoppers and the sellers on Cara.</p>`
+    <p style="margin:0;">A quick rating helps other shoppers and the merchants on EreMarket.</p>`
   await sendEmail(
     email,
     `How was your ${productName}? Leave a review ⭐`,
     layout({
-      preheader: `Rate your ${productName} on Cara.`,
+      preheader: `Rate your ${productName} on EreMarket.`,
       heading: 'Enjoying your purchase?',
       bodyHtml: body,
       cta: { label: 'Write a review', url: `${env.CLIENT_ORIGIN}/product/${product.slug}#reviews` },
-      footerNote: "You're receiving this because you placed an order on Cara.",
+      footerNote: "You're receiving this because you placed an order on EreMarket.",
     }),
   )
 }
@@ -430,13 +432,13 @@ export function buildContactMessage(input: ContactInput): { subject: string; htm
     <p style="margin:20px 0 0;font-size:13px;color:${MUTED};">Hit reply to respond to ${esc(input.name)} directly.</p>`
 
   return {
-    subject: `[Cara contact] ${subject}`,
+    subject: `[EreMarket contact] ${subject}`,
     html: layout({
       preheader: `${input.name} <${input.email}>: ${input.message.slice(0, 100)}`,
       heading: 'New message from the contact page',
       subheading: new Date().toLocaleString('en-NG', { dateStyle: 'long', timeStyle: 'short' }),
       bodyHtml: body,
-      footerNote: 'Sent from the contact form on your Cara site.',
+      footerNote: 'Sent from the contact form on your EreMarket site.',
     }),
   }
 }
@@ -454,17 +456,17 @@ export async function sendContactMessage(input: ContactInput): Promise<EmailResu
 /** Diagnostic send to confirm RESEND_API_KEY + EMAIL_FROM work end-to-end. */
 export async function sendTestEmail(to: string): Promise<EmailResult> {
   const body = `
-    <p style="margin:0 0 12px;">This is a test email from your Cara server.</p>
+    <p style="margin:0 0 12px;">This is a test email from your EreMarket server.</p>
     <p style="margin:0;">If you're reading this, <strong>RESEND_API_KEY</strong> and <strong>EMAIL_FROM</strong> are configured correctly. 🎉</p>`
   return sendEmail(
     to,
-    'Cara email test ✅',
+    'EreMarket email test ✅',
     layout({
-      preheader: 'Your Cara email configuration works.',
+      preheader: 'Your EreMarket email configuration works.',
       heading: 'Email is working',
       bodyHtml: body,
-      cta: { label: 'Go to Cara', url: env.CLIENT_ORIGIN },
-      footerNote: 'Diagnostic email from your Cara server.',
+      cta: { label: 'Go to EreMarket', url: env.CLIENT_ORIGIN },
+      footerNote: 'Diagnostic email from your EreMarket server.',
     }),
   )
 }
