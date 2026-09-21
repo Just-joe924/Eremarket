@@ -1,7 +1,8 @@
-# Cara — Marketplace (full-stack)
+# EreMarket — Marketplace (full-stack)
 
 A full-stack marketplace where sellers open a storefront and buyers shop across
-every store. Evolved from the original static HTML/CSS Cara template.
+every store. Evolved from the original static HTML/CSS Cara template, since rebranded
+to EreMarket for local retail around Ojodu, Lagos.
 
 Prices are in **naira**. Buyers pay online through Paystack (card, bank transfer,
 USSD) or reserve an order and pay the seller when they collect it in person.
@@ -32,7 +33,7 @@ legacy/    Original static HTML/CSS/JS site, kept for reference
 
 ## Features
 
-- Responsive Cara UI in Tailwind (mobile nav, hero, product grid, cart, checkout, blog, about, contact).
+- Responsive EreMarket UI in Tailwind (mobile nav, hero, product grid, cart, checkout, blog, about, contact).
 - Seller storefronts: onboarding with shop address + contact details, product management, per-item fulfillment.
 - Cart, wishlist and reviews backed by Supabase with RLS.
 - Checkout in naira: pick up at the shop or have it delivered; pay online via Paystack or pay on collection.
