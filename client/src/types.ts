@@ -126,10 +126,12 @@ export interface Order {
   order_items?: OrderItem[]
 }
 
+/** Static marketing content for /blog — not persisted, not fetched. */
 export interface BlogPost {
   id: number
   title: string
   excerpt: string
-  image: string
-  date: string // e.g. "13/01"
+  category: string // drives the card's coloured label, e.g. "Inventory"
+  date: string // e.g. "14 Mar"
+  readMinutes: number
 }

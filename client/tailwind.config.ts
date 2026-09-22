@@ -5,28 +5,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#088178', // Cara teal
-        'primary-soft': '#e8f6ea',
-        'primary-border': '#cce7d0',
-        header: '#e3e6f3',
-        ink: '#222222',
-        muted: '#465b52',
-        'muted-2': '#606063',
-        accent: '#ef3636',
-        'accent-2': '#ec544e',
-        navy: '#041e42',
-        star: '#f3b519',
+        /* --- EreMarket brand --------------------------------------------
+           Deep teal carries structure (header, footer, banners, sidebar);
+           vibrant orange is reserved for the primary action on a screen.
+           `primary` is aliased to the teal so the utilities already spread
+           across the app inherit the new palette without being rewritten. */
+        'brand-teal': '#1f5257',
+        'brand-orange': '#faa327',
+
+        primary: '#1f5257',
+        'primary-dark': '#153c40',
+        'primary-soft': '#e7efef',
+        'primary-border': '#d2e0e0',
+
+        cta: '#faa327',
+        'cta-hover': '#e8900f',
+        'cta-soft': '#fef4e6',
+        'cta-ink': '#8a5405', // orange dark enough to read as text on white
+
+        surface: '#ffffff',
+        'surface-2': '#f7f8f8',
+
+        header: '#f7f8f8', // light rules and table borders
+        ink: '#1b2426',
+        muted: '#4a5c5e',
+        'muted-2': '#6c7b7d',
+        accent: '#d23b2f', // destructive / error only
+        'accent-2': '#e2614f',
+        star: '#faa327',
       },
       fontFamily: {
         sans: ['"League Spartan"', 'sans-serif'],
-      },
-      backgroundImage: {
-        hero: "url('/img/hero4.png')",
-        'shop-header': "url('/img/banner/b1.jpg')",
-        'blog-header': "url('/img/banner/b19.jpg')",
-        'about-header': "url('/img/about/banner.png')",
-        'banner-repair': "url('/img/banner/b2.jpg')",
-        newsletter: "url('/img/banner/b14.png')",
       },
     },
   },

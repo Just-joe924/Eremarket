@@ -8,7 +8,7 @@ const ROLES = ['customer', 'seller', 'admin']
 const roleBadge: Record<string, string> = {
   admin: 'bg-[#efe7ff] text-[#6d28d9]',
   seller: 'bg-primary-soft text-primary',
-  customer: 'bg-[#eef1f5] text-muted',
+  customer: 'bg-surface-2 text-muted',
 }
 
 export default function Users() {
@@ -75,19 +75,20 @@ export default function Users() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold text-ink">Users <span className="text-sm font-normal text-muted">({users.length})</span></h2>
+        <h2 className="text-xl font-bold text-primary">Customers &amp; merchants <span className="text-sm font-normal text-muted">({users.length})</span></h2>
         <input
           type="search"
           placeholder="Search name or email…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-64 rounded border border-[#e1e1e1] px-3 py-2 text-sm outline-none focus:border-primary"
+          aria-label="Search users"
+          className="w-64 rounded-md border border-primary-border px-3 py-2 text-sm outline-none focus:border-primary"
         />
       </div>
 
       {error && <p className="rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
 
-      <div className="overflow-x-auto rounded-xl border border-[#e6eaf0] bg-white">
+      <div className="overflow-x-auto rounded-xl border border-primary-border bg-surface">
         {loading ? (
           <div className="flex justify-center py-16">
             <i className="fa-solid fa-spinner fa-spin text-2xl text-primary"></i>
@@ -95,7 +96,7 @@ export default function Users() {
         ) : (
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-[#e6eaf0] text-left text-xs font-bold uppercase text-muted">
+              <tr className="border-b border-primary-border bg-surface-2 text-left text-xs font-bold uppercase tracking-wide text-primary">
                 <th className="px-4 py-3">User</th>
                 <th className="px-4 py-3">Role</th>
                 <th className="px-4 py-3">Orders</th>
@@ -108,9 +109,9 @@ export default function Users() {
               {filtered.map((u) => {
                 const self = u.id === user?.id
                 return (
-                  <tr key={u.id} className="border-b border-[#f0f2f5] last:border-0">
+                  <tr key={u.id} className="border-b border-primary-border last:border-0">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-ink">
+                      <div className="font-semibold text-ink">
                         {u.full_name || '—'} {self && <span className="text-xs text-muted">(you)</span>}
                       </div>
                       <div className="text-xs text-muted-2">{u.email ?? '—'}</div>
@@ -125,7 +126,8 @@ export default function Users() {
                           value={u.role}
                           disabled={busy === u.id}
                           onChange={(e) => changeRole(u.id, e.target.value)}
-                          className="rounded border border-[#e1e1e1] bg-white px-2 py-1 text-xs capitalize outline-none focus:border-primary"
+                          aria-label="Change role"
+                          className="rounded-md border border-primary-border bg-surface px-2 py-1 text-xs capitalize outline-none focus:border-primary"
                         >
                           {ROLES.map((r) => (
                             <option key={r} value={r}>{r}</option>
@@ -151,7 +153,15 @@ export default function Users() {
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-muted">No users match your search.</td>
+                  <td colSpan={6} className="px-4 py-14 text-center">
+                    {/* No EreMarket customer illustration was supplied, so this
+                        empty state is type and an icon rather than artwork. */}
+                    <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft text-2xl text-primary">
+                      <i className="fa-solid fa-user-group" aria-hidden="true"></i>
+                    </span>
+                    <p className="font-bold text-primary">No one matches that search</p>
+                    <p className="mt-1 text-sm text-muted">Customers and merchants appear here as they register.</p>
+                  </td>
                 </tr>
               )}
             </tbody>

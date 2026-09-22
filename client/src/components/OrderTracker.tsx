@@ -45,17 +45,17 @@ export default function OrderTracker({ items }: { items: OrderItem[] }) {
                   className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm transition ${
                     done
                       ? 'border-primary bg-primary text-white'
-                      : 'border-[#e1e1e1] bg-white text-muted-2'
-                  } ${isCurrent ? 'ring-4 ring-primary-soft' : ''}`}
+                      : 'border-primary-border bg-surface text-muted-2'
+                  } ${isCurrent ? 'ring-4 ring-cta/30' : ''}`}
                 >
                   <i className={`fa-solid ${stage.icon}`}></i>
                 </span>
-                <span className={`mt-1.5 text-xs font-medium ${done ? 'text-ink' : 'text-muted-2'}`}>
+                <span className={`mt-1.5 text-xs font-semibold ${done ? 'text-primary' : 'text-muted-2'}`}>
                   {stage.label}
                 </span>
               </div>
               {i < STAGES.length - 1 && (
-                <div className={`mx-1 h-0.5 flex-1 ${i < current ? 'bg-primary' : 'bg-[#e1e1e1]'}`}></div>
+                <div className={`mx-1 h-0.5 flex-1 ${i < current ? 'bg-primary' : 'bg-primary-border'}`}></div>
               )}
             </div>
           )

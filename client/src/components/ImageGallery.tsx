@@ -7,14 +7,18 @@ import { useState } from 'react'
 export default function ImageGallery({ images, alt }: { images: string[]; alt: string }) {
   const [active, setActive] = useState(0)
   if (images.length === 0) {
-    return <div className="aspect-square w-full rounded-lg bg-[#f0f2f5]" />
+    return <div className="aspect-square w-full rounded-lg bg-surface-2" />
   }
 
   const current = images[Math.min(active, images.length - 1)]
 
   return (
     <div>
-      <img className="aspect-square w-full rounded-lg object-cover" src={current} alt={alt} />
+      <img
+        className="aspect-square w-full rounded-lg border border-primary-border object-cover"
+        src={current}
+        alt={alt}
+      />
       {images.length > 1 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {images.map((url, i) => (

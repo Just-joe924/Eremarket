@@ -1,26 +1,30 @@
+/* The tutorial's six flat PNG badges are replaced with Font Awesome glyphs —
+   already loaded app-wide — so the strip carries no legacy artwork. */
 const features = [
-  { img: '/img/features/f1.png', label: 'Pickup or Delivery', badge: 'bg-[#fddde4]' },
-  { img: '/img/features/f2.png', label: 'Online Order', badge: 'bg-[#cdebbc]' },
-  { img: '/img/features/f3.png', label: 'Fair Prices', badge: 'bg-[#d1e8f2]' },
-  { img: '/img/features/f4.png', label: 'Promotions', badge: 'bg-[#cdd4f8]' },
-  { img: '/img/features/f5.png', label: 'Trusted Sellers', badge: 'bg-[#f6dbf6]' },
-  { img: '/img/features/f6.png', label: '24/7 Support', badge: 'bg-[#fff2e5]' },
+  { icon: 'fa-store', label: 'Collect in store' },
+  { icon: 'fa-truck-fast', label: 'Delivery nearby' },
+  { icon: 'fa-naira-sign', label: 'Prices in naira' },
+  { icon: 'fa-boxes-stacked', label: 'Live stock counts' },
+  { icon: 'fa-shield-halved', label: 'Verified merchants' },
+  { icon: 'fa-headset', label: 'Support any day' },
 ]
 
 export default function Feature() {
   return (
-    <section className="section-x flex flex-wrap items-center justify-center gap-y-8 sm:justify-between">
-      {features.map((f) => (
-        <div
-          key={f.label}
-          className="w-[155px] rounded border border-primary-border p-[15px] text-center shadow-[20px_20px_34px_rgba(0,0,0,0.03)] transition hover:shadow-[10px_10px_54px_rgba(70,62,221,0.1)] sm:w-[180px] sm:px-[15px] sm:py-[25px]"
-        >
-          <img className="mb-2.5 w-full" src={f.img} alt={f.label} />
-          <h6 className={`inline-block rounded px-2 pb-1.5 pt-[9px] font-semibold leading-none text-primary ${f.badge}`}>
-            {f.label}
-          </h6>
-        </div>
-      ))}
+    <section className="bg-surface-2 px-5 py-10 sm:px-10 lg:px-20">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        {features.map((f) => (
+          <div
+            key={f.label}
+            className="flex flex-col items-center gap-3 rounded-lg border border-primary-border bg-surface px-3 py-6 text-center transition hover:border-primary"
+          >
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg text-cta">
+              <i className={`fa-solid ${f.icon}`} aria-hidden="true"></i>
+            </span>
+            <h6 className="text-[13px] font-bold leading-tight text-primary">{f.label}</h6>
+          </div>
+        ))}
+      </div>
     </section>
   )
 }

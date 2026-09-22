@@ -146,19 +146,22 @@ export default function Checkout() {
     }
   }
 
-  const inputClass = 'w-full rounded border border-[#e1e1e1] px-[15px] py-3 text-sm outline-none focus:border-primary'
+  const inputClass =
+    'w-full rounded-md border border-primary-border bg-surface px-[15px] py-3 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary'
 
   // --- Confirmation view (pay-on-pickup only; online payments land on /checkout/success) ---
   if (orderId) {
     return (
       <section className="section-x flex min-h-[60vh] flex-col items-center justify-center text-center">
-        <i className="fa-solid fa-circle-check text-[64px] text-primary"></i>
-        <h2 className="mt-5 text-3xl text-ink">Your order is reserved!</h2>
+        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-soft">
+          <i className="fa-solid fa-circle-check text-[44px] text-primary"></i>
+        </span>
+        <h2 className="mt-5 text-3xl font-bold text-primary">Your order is reserved</h2>
         <p className="my-3 text-muted">
           Order <strong>#{orderId.slice(0, 8).toUpperCase()}</strong> is set aside for you
           {placedItemCount > 0 ? ` (${placedItemCount} item${placedItemCount > 1 ? 's' : ''})` : ''}.
           <br />
-          Pay <strong className="text-primary">{formatNaira(total)}</strong> when you collect.
+          Pay <strong className="text-cta-ink">{formatNaira(total)}</strong> when you collect.
         </p>
         <p className="max-w-md text-sm text-muted-2">
           We've emailed you a receipt with the shop address. You can also track this order in{' '}
@@ -167,12 +170,12 @@ export default function Checkout() {
           </Link>
           .
         </p>
-        <div className="mt-5 flex justify-center gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link to="/shop">
-            <button className="btn-primary">Continue Shopping</button>
+            <button className="btn-primary">Continue shopping</button>
           </Link>
           <Link to="/">
-            <button className="btn-normal border border-primary-border hover:bg-primary hover:text-white">Back to Home</button>
+            <button className="btn-outline">Back to home</button>
           </Link>
         </div>
       </section>
@@ -182,12 +185,15 @@ export default function Checkout() {
   // --- Empty cart guard ---
   if (items.length === 0) {
     return (
-      <section className="section-x flex min-h-[50vh] flex-col items-center justify-center text-center">
-        <h2 className="text-3xl text-ink">Your cart is empty</h2>
-        <p className="my-4 text-muted">Add some products before heading to checkout.</p>
-        <Link to="/shop">
-          <button className="btn-primary">Go to Shop</button>
-        </Link>
+      <section className="section-x">
+        <div className="empty-state">
+          <img src="/assets/images/empty-cart.svg" alt="" aria-hidden="true" />
+          <h4>Your cart is empty</h4>
+          <p>Add products from a shop before heading to checkout.</p>
+          <Link to="/shop">
+            <button className="btn-primary">Go to shop</button>
+          </Link>
+        </div>
       </section>
     )
   }
@@ -195,14 +201,19 @@ export default function Checkout() {
   // --- Checkout form view ---
   return (
     <>
-      <section className="page-banner bg-shop-header [background-position:top_25%_right_0]">
-        <h2>#checkout</h2>
-        <p className="text-white">One last step — tell us how you'd like to get your order</p>
+      <section className="page-banner">
+        <div className="banner-rule" />
+        <h2>Checkout</h2>
+        <p>One last step — tell us how you'd like to get your order.</p>
       </section>
 
-      <section className="section-x flex flex-wrap items-start gap-10">
-        <form className="flex-1 basis-[420px]" onSubmit={handleSubmit} noValidate>
-          <h3 className="mb-4 text-lg font-semibold">Your Details</h3>
+      <section className="section-x flex flex-wrap items-start gap-10 bg-surface-2">
+        <form
+          className="flex-1 basis-[420px] rounded-lg border border-primary-border bg-surface p-6 sm:p-8"
+          onSubmit={handleSubmit}
+          noValidate
+        >
+          <h3 className="mb-4 text-lg font-bold text-primary">Your details</h3>
 
           <div className="mb-4">
             <input type="text" placeholder="Full Name" value={form.fullName} onChange={(e) => update('fullName', e.target.value)} className={inputClass} />
@@ -221,7 +232,7 @@ export default function Checkout() {
           </div>
 
           {/* --- Delivery or pickup --- */}
-          <h3 className="mb-3 mt-7 text-lg font-semibold">How would you like it?</h3>
+          <h3 className="mb-3 mt-7 text-lg font-bold text-primary">How would you like it?</h3>
           <div className="mb-5 grid gap-3 sm:grid-cols-2">
             <OptionCard
               selected={isPickup}
@@ -264,8 +275,8 @@ export default function Checkout() {
           )}
 
           {isPickup && shops.length > 0 && (
-            <div className="mb-5 rounded-md border-l-[3px] border-primary bg-primary-soft/40 px-4 py-4">
-              <p className="mb-2 text-sm font-semibold text-ink">
+            <div className="mb-5 rounded-md border-l-[3px] border-primary bg-primary-soft px-4 py-4">
+              <p className="mb-2 text-sm font-bold text-primary">
                 {shops.length === 1 ? 'Collect from' : 'Collect from these shops'}
               </p>
               <ul className="space-y-3">
@@ -293,7 +304,7 @@ export default function Checkout() {
           )}
 
           {/* --- Payment --- */}
-          <h3 className="mb-3 mt-7 text-lg font-semibold">Payment</h3>
+          <h3 className="mb-3 mt-7 text-lg font-bold text-primary">Payment</h3>
           <div className="mb-2 grid gap-3 sm:grid-cols-2">
             <OptionCard
               selected={form.payment === 'online'}
@@ -332,12 +343,15 @@ export default function Checkout() {
           </button>
         </form>
 
-        <aside className="flex-1 basis-[320px] rounded-md border border-[#e2e9e1] p-[26px] lg:sticky lg:top-24">
-          <h3 className="mb-4 text-lg font-semibold">Order Summary</h3>
+        <aside className="flex-1 basis-[320px] overflow-hidden rounded-lg border border-primary-border bg-surface lg:sticky lg:top-24">
+          <h3 className="bg-primary px-[26px] py-4 text-base font-bold uppercase tracking-wide text-white">
+            Order summary
+          </h3>
+          <div className="p-[26px]">
           <ul className="mb-4">
             {items.map((item) => (
-              <li key={`${item.product.id}__${item.size}`} className="flex items-center gap-3 border-b border-[#f0f0f0] py-2.5">
-                <img className="h-[50px] w-[50px] rounded-md object-cover" src={item.product.image_url ?? ''} alt={item.product.name} />
+              <li key={`${item.product.id}__${item.size}`} className="flex items-center gap-3 border-b border-primary-border py-2.5 last:border-0">
+                <img className="h-[50px] w-[50px] rounded-md border border-primary-border object-cover" src={item.product.image_url ?? ''} alt={item.product.name} />
                 <div className="flex flex-1 flex-col">
                   <span className="text-[13px] font-semibold text-ink">{item.product.name}</span>
                   <span className="text-xs text-muted-2">
@@ -364,23 +378,24 @@ export default function Checkout() {
                 </td>
               </tr>
               <tr className="text-base">
-                <td className="border-t border-[#e2e9e1] pt-3"><strong>Total</strong></td>
-                <td className="border-t border-[#e2e9e1] pt-3 text-right"><strong>{formatNaira(total)}</strong></td>
+                <td className="border-t border-primary-border pt-3"><strong>Total</strong></td>
+                <td className="border-t border-primary-border pt-3 text-right"><strong className="text-primary">{formatNaira(total)}</strong></td>
               </tr>
             </tbody>
           </table>
           {payOnPickup && (
-            <p className="mb-4 rounded bg-[#fff8ec] px-3 py-2 text-xs text-[#b26a00]">
+            <p className="mb-4 rounded border-l-[3px] border-cta bg-cta-soft px-3 py-2 text-xs font-semibold text-cta-ink">
               You'll pay {formatNaira(total)} at the shop. We'll hold your items until you collect.
             </p>
           )}
           <button
             type="button"
-            className="btn-normal w-full border border-primary-border hover:bg-primary hover:text-white"
+            className="btn-normal w-full"
             onClick={() => navigate('/cart')}
           >
-            Back to Cart
+            Back to cart
           </button>
+          </div>
         </aside>
       </section>
     </>
@@ -409,17 +424,17 @@ function OptionCard({
       onClick={onSelect}
       disabled={disabled}
       aria-pressed={selected}
-      className={`flex items-start gap-3 rounded-md border p-4 text-left transition ${
+      className={`flex items-start gap-3 rounded-md border-2 p-4 text-left transition ${
         disabled
-          ? 'cursor-not-allowed border-[#e1e1e1] opacity-50'
+          ? 'cursor-not-allowed border-primary-border opacity-50'
           : selected
-            ? 'border-primary bg-primary-soft/50'
-            : 'border-[#e1e1e1] hover:border-primary-border'
+            ? 'border-primary bg-primary-soft'
+            : 'border-primary-border hover:border-primary'
       }`}
     >
       <i className={`fa-solid ${icon} mt-0.5 text-lg ${selected ? 'text-primary' : 'text-muted-2'}`}></i>
       <span className="flex-1">
-        <span className="block text-sm font-semibold text-ink">{title}</span>
+        <span className="block text-sm font-bold text-ink">{title}</span>
         <span className="block text-xs text-muted-2">{subtitle}</span>
       </span>
     </button>

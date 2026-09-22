@@ -1,4 +1,4 @@
-# Cara — Setup
+# EreMarket — Setup
 
 Full-stack marketplace: **Vite + React + TS + Tailwind** (client), **Express + TS** (server), **Supabase** (DB/Auth), **Paystack** (NGN payments), **Resend** (email).
 
@@ -67,7 +67,7 @@ legacy/    original static HTML/CSS site (reference only)
 
 ## 6. Payments — Paystack
 
-Cara charges in **naira**. Paystack is used rather than Stripe because Stripe
+EreMarket charges in **naira**. Paystack is used rather than Stripe because Stripe
 does not onboard Nigerian businesses. Without a key, `POST /api/checkout/session`
 returns `501` and online payment is disabled — **pay-on-pickup still works**.
 
@@ -108,15 +108,15 @@ With `RESEND_API_KEY` unset, sends are skipped and logged — nothing breaks.
 
 ```
 RESEND_API_KEY=re_...
-EMAIL_FROM=Cara <hello@yourdomain.ng>   # must be a verified sender/domain
-CONTACT_EMAIL_TO=you@yourdomain.ng      # where contact-form messages land
-LOGO_URL=https://yourdomain.ng/img/logo.png   # must be publicly reachable
+EMAIL_FROM=EreMarket <hello@eremarket.store>   # must be a verified sender/domain
+CONTACT_EMAIL_TO=you@eremarket.store           # where contact-form messages land
+LOGO_URL=https://www.eremarket.store/assets/brand/logo-eremarket-on-teal.png
 ```
 
 `onboarding@resend.dev` works for early testing but only delivers to your own
 Resend account email — verify a domain to reach anyone else. `LOGO_URL` defaults
-to `CLIENT_ORIGIN/img/logo.png`; a `localhost` value renders as a broken image
-in real inboxes, so set it explicitly once deployed.
+to `CLIENT_ORIGIN/assets/brand/logo-eremarket-on-teal.png`; a `localhost` value
+renders as a broken image in real inboxes, so set it explicitly once deployed.
 
 ```bash
 npm run test:email -w server -- you@example.com   # end-to-end send check
@@ -125,6 +125,136 @@ npm run preview:email -w server                   # render every email to HTML, 
 
 `preview:email` writes `server/.email-preview/*.html` — open them in a browser
 to check the design without placing an order.
+
+## 8. Domain cutover — caraecom.store → eremarket.store
+
+Do these **in order**. The ordering matters: `CLIENT_ORIGIN` is the single
+allowed CORS origin (`server/src/index.ts`), so flipping it before the new
+domain resolves will break the live site.
+
+Pick **one** canonical host first and use it everywhere below. These examples
+use `https://www.eremarket.store`. `https://eremarket.store` and
+`https://www.eremarket.store` are *different origins* to CORS — mixing them is
+the most common way this goes wrong.
+
+**1. Vercel — add the domain**
+- Project → Settings → Domains → add both `eremarket.store` and
+  `www.eremarket.store`; mark the canonical one Primary. Vercel 308-redirects
+  the other, so visitors always end up on the canonical origin.
+- Keep `caraecom.store` attached and redirect it to the new domain. Do **not**
+  delete it until traffic and links have moved — see the CORS note below.
+- Wait for DNS + the TLS certificate to go green before step 2.
+
+**2. Render (API) — environment**
+| Variable | New value |
+|---|---|
+| `CLIENT_ORIGIN` | `https://www.eremarket.store` |
+| `LOGO_URL` | `https://www.eremarket.store/assets/brand/logo-eremarket-on-teal.png` |
+
+`CLIENT_ORIGIN` also drives the Paystack callback URL and every link in the
+transactional emails, so this one variable moves three things at once.
+
+> **CORS cutover:** the moment `CLIENT_ORIGIN` changes, anyone still sitting on
+> `caraecom.store` gets blocked on every API call. The Vercel redirect in step 1
+> prevents that — it moves the browser to the new origin before any request is
+> made. If you want a grace period where *both* origins work, `cors({ origin: … })`
+> accepts an array; that is a small code change, not an env change.
+
+**3. Supabase — auth redirect URLs**
+`signUp` (`client/src/context/AuthContext.tsx`) passes no `emailRedirectTo`, so
+confirmation and recovery links use the dashboard setting:
+- Authentication → URL Configuration → **Site URL** = `https://www.eremarket.store`
+- Add it to **Redirect URLs** too; keep the old domain listed until old links expire.
+
+Renaming the Supabase **project** in the dashboard is cosmetic and safe. The
+project *ref* is baked into `VITE_SUPABASE_URL` and the keys — never change it.
+Do not rename tables or columns.
+
+**4. Paystack**
+- Settings → API Keys & Webhooks → webhook URL stays the Render host:
+  `https://YOUR_API_HOST/api/webhooks/paystack`. It only changes if you move the
+  API to a custom subdomain.
+- If your account has a callback-URL allowlist, add `https://www.eremarket.store/checkout/success`.
+
+**5. Resend — outbound (sending) domain**
+
+Add the **apex** `eremarket.store` in Resend → Domains → Add Domain, and keep the
+same region as the existing domain (`eu-west-1`) so the records match. Resend
+scopes its own SPF to a `send.` subdomain automatically, which is what keeps it
+from colliding with ImprovMX on the apex — you do **not** add a subdomain by hand.
+
+Resend then shows three records. Add them in Vercel → Domains → `eremarket.store`
+→ DNS Records:
+
+| Type | Name | Value |
+|---|---|---|
+| MX | `send` (priority 10) | `feedback-smtp.eu-west-1.amazonses.com` |
+| TXT | `send` | `v=spf1 include:amazonses.com ~all` |
+| TXT | `resend._domainkey` | the `p=…` key **Resend generates for this domain** |
+
+> Vercel's **Name** field is relative to the domain — enter `send`, not
+> `send.eremarket.store`, or you end up with `send.eremarket.store.eremarket.store`.
+> The DKIM key is per-domain: copy the one Resend shows you, never the old domain's.
+
+Click **Verify** in Resend, then set `EMAIL_FROM=EreMarket <hello@eremarket.store>`
+on Render. Leave `caraecom.store` verified in Resend until nothing sends from it.
+
+**6. ImprovMX — inbound forwarding**
+
+Add on the **apex**, in the same Vercel DNS screen:
+
+| Type | Name | Value |
+|---|---|---|
+| MX | `@` (priority 10) | `mx1.improvmx.com` |
+| MX | `@` (priority 20) | `mx2.improvmx.com` |
+| TXT | `@` | `v=spf1 include:spf.improvmx.com ~all` |
+
+Then create the aliases in ImprovMX (`hello`, `support` — the local part only;
+the field appends the domain) pointing at your real inbox, and set
+`CONTACT_EMAIL_TO` on Render to whichever one should receive contact-form
+messages. Avoid making it the same address as `EMAIL_FROM`; sending from and to
+one address trips loop detection on some filters.
+
+> **ImprovMX free tier allows one domain**, so `eremarket.store` cannot be added
+> while `caraecom.store` still occupies the slot. Don't swap early — do it in the
+> same sitting as the `EMAIL_FROM` flip in step 5: delete the old domain, add the
+> new one, recreate the aliases. The MX records are already live by then, so it
+> goes Active immediately. Until that moment, point `CONTACT_EMAIL_TO` at a plain
+> mailbox (e.g. your Gmail) so inbound forwarding is never on the critical path.
+> Premium ($9/m) lifts the limit and adds SMTP credentials, which is the only way
+> to make Gmail "Send As" reply from `hello@eremarket.store`.
+
+> A domain may have only **one** SPF TXT record on a given name. The apex SPF is
+> ImprovMX's alone — never add `include:amazonses.com` to it. Outbound SPF lives
+> on `send.` (step 5) and the two never meet.
+
+Optional but worth it: neither domain has a DMARC record. Add
+TXT `_dmarc` → `v=DMARC1; p=none; rua=mailto:you@eremarket.store` once the above
+verifies. `p=none` only reports, it rejects nothing, and it helps deliverability
+under Gmail's bulk-sender rules.
+
+**7. This repo**
+- `client/index.html` — point `og:url` and `og:image` at the new domain.
+- Redeploy the client. `VITE_API_URL` is inlined at **build** time, so editing it
+  in Vercel without a redeploy changes nothing.
+
+**8. Verify**
+```bash
+curl -I https://www.eremarket.store                      # 200
+curl -I https://caraecom.store                           # 308 → new domain
+curl -I https://www.eremarket.store/assets/brand/logo-eremarket-on-teal.png
+curl -s https://YOUR_API_HOST/health                     # {"status":"ok",…}
+npm run test:email -w server -- you@example.com          # logo + links resolve
+```
+Then place a real low-value order end to end and confirm the receipt.
+
+**9. Clean-up, once the above is verified**
+- Delete `client/public/img/logo.png` — it only exists so a stale `LOGO_URL`
+  still renders the EreMarket mark.
+- Two deliberate `cara` strings remain and are safe to leave:
+  `GUEST_KEY = 'cara-cart-guest'` (`client/src/context/CartContext.tsx`) — renaming
+  empties every guest cart once — and `service: 'cara-api'` in `/health`, which is
+  an API response field, not UI.
 
 ## Status
 - ✅ Monorepo + Tailwind migration

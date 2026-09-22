@@ -2,13 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/img/logo.png" />
+    <link rel="icon" href="/assets/brand/favicon.ico" />
+    <link rel="apple-touch-icon" href="/assets/brand/app-icon.png" />
+    <meta name="theme-color" content="#1f5257" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
-    <title>Cara — Fashion E-commerce</title>
+    <title>EreMarket — Shops, Supermarkets &amp; Suppliers Near You</title>
+    <meta
+      name="description"
+      content="EreMarket is the retail marketplace for Ojodu and around. Shops, supermarkets and suppliers list their stock in naira; buyers order online or reserve and pay on collection."
+    />
+
+    <!-- Link preview card, mostly for WhatsApp. og:image must be an absolute URL. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="EreMarket" />
+    <meta property="og:title" content="EreMarket — Shops, Supermarkets &amp; Suppliers Near You" />
+    <meta
+      property="og:description"
+      content="Order from local shops and supermarkets in naira. Pay online, or reserve and pay when you collect."
+    />
+    <!-- Canonical host. og:image must stay an absolute URL on a live origin. -->
+    <meta property="og:url" content="https://www.eremarket.store/" />
+    <meta
+      property="og:image"
+      content="https://www.eremarket.store/assets/brand/app-icon.png"
+    />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <div id="root"></div>
@@ -18,12 +40,12 @@
         var root = document.getElementById('root')
         if (root && !root.hasChildNodes()) {
           root.innerHTML =
-            '<div style="font-family:sans-serif;max-width:640px;margin:80px auto;padding:24px;text-align:center;color:#222">' +
-            '<h1 style="color:#088178;margin:0 0 12px">App failed to start</h1>' +
+            '<div style="font-family:sans-serif;max-width:640px;margin:80px auto;padding:24px;text-align:center;color:#1b2426">' +
+            '<h1 style="color:#1f5257;margin:0 0 12px">App failed to start</h1>' +
             '<p style="margin:0 0 12px">' +
             ((e && e.message) || 'A startup error occurred.') +
             '</p>' +
-            '<p style="color:#666;font-size:14px;margin:0">Open the browser console for details. If this mentions Supabase env, set ' +
+            '<p style="color:#6c7b7d;font-size:14px;margin:0">Open the browser console for details. If this mentions Supabase env, set ' +
             '<code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code> in your host and redeploy.</p>' +
             '</div>'
         }

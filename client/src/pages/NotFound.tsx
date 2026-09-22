@@ -4,10 +4,11 @@ export default function NotFound() {
   return (
     <section className="section-x flex min-h-[60vh] flex-col items-center justify-center text-center">
       <h1 className="text-[64px] font-bold text-primary">404</h1>
-      <h2 className="text-3xl text-ink">Page not found</h2>
+      <div className="banner-rule mt-1 bg-cta" />
+      <h2 className="text-3xl font-bold text-ink">Page not found</h2>
       <p className="my-4 text-muted">The page you're looking for doesn't exist or has been moved.</p>
       <Link to="/">
-        <button className="btn-primary">Back to Home</button>
+        <button className="btn-primary">Back to home</button>
       </Link>
     </section>
   )

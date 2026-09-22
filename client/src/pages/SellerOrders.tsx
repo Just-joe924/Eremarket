@@ -6,7 +6,7 @@ import { formatNaira } from '../lib/money'
 const STATUSES = ['processing', 'shipped', 'delivered', 'cancelled']
 
 const statusColor: Record<string, string> = {
-  processing: 'bg-[#fff2e5] text-[#b26a00]',
+  processing: 'bg-cta-soft text-cta-ink',
   shipped: 'bg-[#d1e8f2] text-[#0b6ba8]',
   delivered: 'bg-primary-soft text-primary',
   cancelled: 'bg-[#fdecec] text-accent',
@@ -54,35 +54,42 @@ export default function SellerOrders() {
 
   return (
     <>
-      <section className="page-banner bg-shop-header [background-position:top_25%_right_0]">
+      <section className="page-banner">
+        <div className="banner-rule" />
         <h2>Orders</h2>
-        <p className="text-white">Fulfill orders for your products</p>
+        <p>Fulfil the orders placed against your inventory.</p>
       </section>
 
-      <section className="section-x">
+      <section className="section-x bg-surface-2">
         <div className="mb-6 flex items-center gap-4">
-          <Link to="/seller" className="text-sm font-semibold text-primary">
-            ← Back to products
+          <Link to="/seller" className="text-sm font-bold text-primary hover:underline">
+            ← Back to inventory
           </Link>
         </div>
 
         {error && <p className="mb-4 rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
 
         {orders.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-primary-border py-16 text-center">
-            <i className="fa-solid fa-receipt mb-4 text-4xl text-primary-border"></i>
-            <h4 className="mb-2 text-lg">No orders yet</h4>
-            <p className="text-sm text-muted">Orders containing your products will appear here.</p>
+          <div className="empty-state">
+            <img src="/assets/images/empty-orders.svg" alt="" aria-hidden="true" />
+            <h4>No orders yet</h4>
+            <p>
+              Orders containing your products will appear here, with the buyer's details and a
+              status you can update.
+            </p>
+            <Link to="/seller">
+              <button className="btn-primary">Back to inventory</button>
+            </Link>
           </div>
         ) : (
           <div className="space-y-6">
             {orders.map(({ order, items }) => {
               const ship = (order.shipping_address ?? {}) as Record<string, string>
               return (
-                <div key={order.id} className="rounded-lg border border-[#e1e1e1] p-5">
-                  <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-[#f0f0f0] pb-3">
+                <div key={order.id} className="rounded-lg border border-primary-border bg-surface p-5">
+                  <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-primary-border pb-3">
                     <div>
-                      <p className="font-semibold text-ink">Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                      <p className="font-bold text-primary">Order #{order.id.slice(0, 8).toUpperCase()}</p>
                       <p className="text-xs text-muted-2">
                         {new Date(order.created_at).toLocaleDateString()}
                       </p>
@@ -91,7 +98,7 @@ export default function SellerOrders() {
                           <i className={`fa-solid ${order.fulfilment === 'pickup' ? 'fa-store' : 'fa-truck'} mr-1`}></i>
                           {order.fulfilment === 'pickup' ? 'Collecting in store' : 'Delivery'}
                         </span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${order.payment_method === 'pickup' ? 'bg-[#fff2e5] text-[#b26a00]' : 'bg-[#e9f9ef] text-[#059669]'}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${order.payment_method === 'pickup' ? 'bg-cta-soft text-cta-ink' : 'bg-[#e9f9ef] text-[#059669]'}`}>
                           {order.payment_method === 'pickup' ? 'Collect payment on handover' : 'Paid online'}
                         </span>
                       </div>
@@ -112,10 +119,10 @@ export default function SellerOrders() {
                         <img
                           src={it.image_url ?? 'https://placehold.co/48x48?text=No+Img'}
                           alt={it.name}
-                          className="h-12 w-12 rounded object-cover"
+                          className="h-12 w-12 rounded border border-primary-border object-cover"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-ink">{it.name}</p>
+                          <p className="text-sm font-semibold text-ink">{it.name}</p>
                           <p className="text-xs text-muted-2">
                             Qty {it.quantity}
                             {it.size && ` · ${it.size}`} · {formatNaira(it.price_at_purchase)}
@@ -127,7 +134,8 @@ export default function SellerOrders() {
                         <select
                           value={it.status}
                           onChange={(e) => changeStatus(it.id, e.target.value)}
-                          className="rounded border border-primary-border bg-white px-2 py-1.5 text-sm outline-none"
+                          aria-label={`Update status for ${it.name}`}
+                          className="rounded-md border border-primary-border bg-surface px-2 py-1.5 text-sm outline-none focus:border-primary"
                         >
                           {STATUSES.map((s) => (
                             <option key={s} value={s}>{s}</option>

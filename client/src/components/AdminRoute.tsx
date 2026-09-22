@@ -13,7 +13,7 @@ export default function AdminRoute({ children }: { children: React.ReactNode }) 
   // Wait until auth + the profile row (which carries the role) have resolved.
   if (loading || (user && !profile)) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0f1720]">
+      <div className="flex min-h-screen items-center justify-center bg-primary-dark">
         <i className="fa-solid fa-spinner fa-spin text-3xl text-primary"></i>
       </div>
     )

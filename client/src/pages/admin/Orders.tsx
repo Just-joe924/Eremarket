@@ -3,7 +3,7 @@ import { fetchOrders, type AdminOrder } from '../../api/admin'
 import { formatNaira as money } from '../../lib/money'
 
 const statusBadge: Record<string, string> = {
-  pending: 'bg-[#fff2e5] text-[#b26a00]',
+  pending: 'bg-cta-soft text-cta-ink',
   paid: 'bg-[#e9f9ef] text-[#059669]',
   shipped: 'bg-[#d1e8f2] text-[#0b6ba8]',
   delivered: 'bg-primary-soft text-primary',
@@ -29,21 +29,30 @@ export default function Orders() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-ink">Orders <span className="text-sm font-normal text-muted">({orders.length})</span></h2>
+      <h2 className="text-xl font-bold text-primary">Orders <span className="text-sm font-normal text-muted">({orders.length})</span></h2>
 
       {error && <p className="rounded bg-[#fdecec] px-3 py-2 text-sm text-accent">{error}</p>}
 
-      <div className="overflow-x-auto rounded-xl border border-[#e6eaf0] bg-white">
+      <div className="overflow-x-auto rounded-xl border border-primary-border bg-surface">
         {loading ? (
           <div className="flex justify-center py-16">
             <i className="fa-solid fa-spinner fa-spin text-2xl text-primary"></i>
           </div>
         ) : orders.length === 0 ? (
-          <p className="px-4 py-10 text-center text-muted">No orders yet.</p>
+          <div className="px-4 py-14 text-center">
+            <img
+              src="/assets/images/empty-orders.svg"
+              alt=""
+              aria-hidden="true"
+              className="mx-auto mb-5 h-36 w-auto"
+            />
+            <p className="font-bold text-primary">No orders yet</p>
+            <p className="mt-1 text-sm text-muted">Orders placed on the marketplace land here.</p>
+          </div>
         ) : (
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b border-[#e6eaf0] text-left text-xs font-bold uppercase text-muted">
+              <tr className="border-b border-primary-border bg-surface-2 text-left text-xs font-bold uppercase tracking-wide text-primary">
                 <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Customer</th>
                 <th className="px-4 py-3">Date</th>
@@ -60,21 +69,21 @@ export default function Orders() {
                   <Fragment key={o.id}>
                     <tr
                       onClick={() => setOpen(isOpen ? null : o.id)}
-                      className="cursor-pointer border-b border-[#f0f2f5] hover:bg-[#fafbfc] last:border-0"
+                      className="cursor-pointer border-b border-primary-border last:border-0 hover:bg-surface-2"
                     >
                       <td className="px-4 py-3 font-mono text-xs text-muted-2">#{o.id.slice(0, 8)}</td>
                       <td className="px-4 py-3 text-ink">{ship.full_name ?? '—'}</td>
                       <td className="px-4 py-3 text-muted">{new Date(o.created_at).toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-ink">{o.order_items?.length ?? 0}</td>
                       <td className="px-4 py-3">
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusBadge[o.status] ?? 'bg-[#eef1f5] text-muted'}`}>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusBadge[o.status] ?? 'bg-surface-2 text-muted'}`}>
                           {o.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-semibold text-ink">{money(o.total_amount)}</td>
+                      <td className="px-4 py-3 text-right font-bold text-primary">{money(o.total_amount)}</td>
                     </tr>
                     {isOpen && (
-                      <tr className="bg-[#fafbfc]">
+                      <tr className="bg-surface-2">
                         <td colSpan={6} className="px-4 py-3">
                           <div className="space-y-1.5">
                             {(o.order_items ?? []).map((it) => (

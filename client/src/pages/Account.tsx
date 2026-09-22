@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { fetchOrders } from '../api/orders'
 import OrderTracker from '../components/OrderTracker'
@@ -7,7 +7,7 @@ import { formatNaira } from '../lib/money'
 import type { Order } from '../types'
 
 const statusColor: Record<string, string> = {
-  pending: 'bg-[#fff2e5] text-[#b26a00]',
+  pending: 'bg-cta-soft text-cta-ink',
   paid: 'bg-primary-soft text-primary',
   shipped: 'bg-[#d1e8f2] text-[#1d6f8b]',
   delivered: 'bg-[#cdebbc] text-[#3d7a1f]',
@@ -15,7 +15,7 @@ const statusColor: Record<string, string> = {
 }
 
 const itemStatusColor: Record<string, string> = {
-  processing: 'bg-[#fff2e5] text-[#b26a00]',
+  processing: 'bg-cta-soft text-cta-ink',
   shipped: 'bg-[#d1e8f2] text-[#1d6f8b]',
   delivered: 'bg-[#cdebbc] text-[#3d7a1f]',
   cancelled: 'bg-[#fdecec] text-accent',
@@ -46,14 +46,15 @@ export default function Account() {
 
   return (
     <>
-      <section className="page-banner bg-about-header [background-position:top_25%_right_0]">
-        <h2>My Account</h2>
-        <p className="text-white">Manage your profile and track your orders</p>
+      <section className="page-banner">
+        <div className="banner-rule" />
+        <h2>My account</h2>
+        <p>Manage your profile and track every order you've placed.</p>
       </section>
 
-      <section className="section-x grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <aside className="rounded-lg border border-[#e1e1e1] p-6">
-          <h3 className="mb-4 text-lg font-semibold">Profile</h3>
+      <section className="section-x grid grid-cols-1 gap-8 bg-surface-2 lg:grid-cols-3">
+        <aside className="h-fit rounded-lg border border-primary-border bg-surface p-6">
+          <h3 className="mb-4 text-lg font-bold text-primary">Profile</h3>
           <dl className="space-y-3 text-sm">
             <div>
               <dt className="text-muted-2">Name</dt>
@@ -70,30 +71,31 @@ export default function Account() {
               </dd>
             </div>
           </dl>
-          <button
-            onClick={handleSignOut}
-            className="btn-normal mt-6 w-full border border-primary-border hover:bg-primary hover:text-white"
-          >
-            Sign Out
+          <button onClick={handleSignOut} className="btn-normal mt-6 w-full">
+            Sign out
           </button>
         </aside>
 
         <div className="lg:col-span-2">
-          <h3 className="mb-4 text-lg font-semibold">Order History</h3>
+          <h3 className="mb-4 text-lg font-bold text-primary">Order history</h3>
           {loading ? (
             <p className="text-muted">Loading orders…</p>
           ) : orders.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-[#e1e1e1] p-10 text-center">
-              <i className="fa-solid fa-box-open mb-3 text-4xl text-primary-border"></i>
-              <p className="text-muted">You haven't placed any orders yet.</p>
+            <div className="empty-state">
+              <img src="/assets/images/empty-orders.svg" alt="" aria-hidden="true" />
+              <h4>No orders yet</h4>
+              <p>Once you order from a shop, it shows up here with its collection details.</p>
+              <Link to="/shop">
+                <button className="btn-primary">Start shopping</button>
+              </Link>
             </div>
           ) : (
             <div className="space-y-4">
               {orders.map((order) => (
-                <div key={order.id} className="rounded-lg border border-[#e1e1e1] p-5">
+                <div key={order.id} className="rounded-lg border border-primary-border bg-surface p-5">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <span className="text-sm font-bold text-ink">#{order.id.slice(0, 8)}</span>
+                      <span className="text-sm font-bold text-primary">#{order.id.slice(0, 8)}</span>
                       <span className="ml-3 text-xs text-muted-2">
                         {new Date(order.created_at).toLocaleDateString()}
                       </span>
@@ -106,7 +108,7 @@ export default function Account() {
                       {order.status}
                     </span>
                   </div>
-                  <ul className="mb-4 divide-y divide-[#f0f0f0]">
+                  <ul className="mb-4 divide-y divide-primary-border">
                     {(order.order_items ?? []).map((item) => (
                       <li key={item.id} className="flex items-center gap-3 py-2">
                         {item.products?.image_url && (
@@ -135,7 +137,7 @@ export default function Account() {
                     ))}
                   </ul>
 
-                  <div className="mb-4 rounded-lg bg-[#fafbfc] px-4 py-4">
+                  <div className="mb-4 rounded-lg bg-surface-2 px-4 py-4">
                     <OrderTracker items={order.order_items ?? []} />
                   </div>
 
