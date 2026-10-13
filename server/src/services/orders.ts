@@ -40,11 +40,24 @@ export async function loadCartLines(userId: string): Promise<OrderLine[]> {
   return lines
 }
 
-/** Reject when any line exceeds available stock (409 with the offending items). */
+/**
+ * Reject when the order asks for more of a product than is in stock (409 with
+ * the offending items). Quantities are summed per product, since the same
+ * product can appear on several lines — one per size — and stock is held
+ * against the product, not the size.
+ */
 export function assertStock(lines: OrderLine[]): void {
-  const insufficient = lines
-    .filter((l) => l.quantity > l.product.stock)
-    .map((l) => ({ name: l.product.name, requested: l.quantity, available: l.product.stock }))
+  const requestedByProduct = new Map<string, { name: string; requested: number; available: number }>()
+  for (const l of lines) {
+    const seen = requestedByProduct.get(l.product.id)
+    requestedByProduct.set(l.product.id, {
+      name: l.product.name,
+      requested: (seen?.requested ?? 0) + l.quantity,
+      available: l.product.stock,
+    })
+  }
+
+  const insufficient = [...requestedByProduct.values()].filter((p) => p.requested > p.available)
   if (insufficient.length > 0) throw new OrderError(409, 'Insufficient stock', insufficient)
 }
 
@@ -106,13 +119,35 @@ export async function createOrderWithItems(
   return { order, orderItems }
 }
 
+/**
+ * Total ordered per product. Lines are per product + size, so quantities must be
+ * summed before touching stock — otherwise two sizes of one product each write
+ * `stock - quantity` and one of the decrements is lost.
+ */
+function totalPerProduct(
+  entries: { productId: string; quantity: number; stock: number }[],
+): Map<string, { quantity: number; stock: number }> {
+  const totals = new Map<string, { quantity: number; stock: number }>()
+  for (const e of entries) {
+    const seen = totals.get(e.productId)
+    totals.set(e.productId, {
+      quantity: (seen?.quantity ?? 0) + e.quantity,
+      stock: e.stock,
+    })
+  }
+  return totals
+}
+
 export async function decrementStock(lines: OrderLine[]): Promise<void> {
+  const totals = totalPerProduct(
+    lines.map((l) => ({ productId: l.product.id, quantity: l.quantity, stock: l.product.stock })),
+  )
   await Promise.all(
-    lines.map((l) =>
+    [...totals.entries()].map(([productId, t]) =>
       supabaseAdmin
         .from('products')
-        .update({ stock: Math.max(0, l.product.stock - l.quantity) })
-        .eq('id', l.product.id),
+        .update({ stock: Math.max(0, t.stock - t.quantity) })
+        .eq('id', productId),
     ),
   )
 }
@@ -148,14 +183,25 @@ export async function markOrderPaid(orderId: string): Promise<'fulfilled' | 'alr
     products: { stock: number } | null
   }[]
 
+  const totals = totalPerProduct(
+    items
+      .filter(
+        (it): it is { product_id: string; quantity: number; products: { stock: number } } =>
+          Boolean(it.product_id) && it.products !== null,
+      )
+      .map((it) => ({
+        productId: it.product_id,
+        quantity: it.quantity,
+        stock: it.products.stock,
+      })),
+  )
+
   await Promise.all(
-    items.map((it) =>
-      it.products && it.product_id
-        ? supabaseAdmin
-            .from('products')
-            .update({ stock: Math.max(0, it.products.stock - it.quantity) })
-            .eq('id', it.product_id)
-        : Promise.resolve(),
+    [...totals.entries()].map(([productId, t]) =>
+      supabaseAdmin
+        .from('products')
+        .update({ stock: Math.max(0, t.stock - t.quantity) })
+        .eq('id', productId),
     ),
   )
 

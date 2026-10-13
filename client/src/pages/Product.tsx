@@ -15,7 +15,7 @@ import type { Product as ProductType } from '../types'
 export default function Product() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { addToCart } = useCart()
+  const { addToCart, quantityInCart } = useCart()
   const { user } = useAuth()
   const { isWishlisted, toggle } = useWishlist()
 
@@ -26,6 +26,7 @@ export default function Product() {
   const [sizeError, setSizeError] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
+  const [stockNote, setStockNote] = useState('')
 
   useEffect(() => {
     if (!slug) return
@@ -34,6 +35,7 @@ export default function Product() {
     setAdded(false)
     setQuantity(1)
     setSize('')
+    setStockNote('')
     getProductBySlug(slug)
       .then(async (p) => {
         if (!active) return
@@ -80,15 +82,26 @@ export default function Product() {
 
   const wishlisted = isWishlisted(product.id)
   const outOfStock = product.stock <= 0
+  // What this buyer can still add: stock less whatever is already in the cart
+  // for the selected size.
+  const inCart = quantityInCart(product.id, size)
+  const remaining = Math.max(0, product.stock - inCart)
+  const maxSelectable = Math.max(1, remaining)
+  const atStockLimit = !outOfStock && remaining === 0
 
-  function handleAddToCart() {
-    if (!product || outOfStock) return
+  async function handleAddToCart() {
+    if (!product || outOfStock || atStockLimit) return
     if (product.sizes.length > 0 && !size) {
       setSizeError('Please select a size.')
       return
     }
-    addToCart(product, quantity, size)
+    const result = await addToCart(product, quantity, size)
     setAdded(true)
+    setStockNote(
+      result.capped
+        ? `Only ${result.stock} in stock — your cart now holds ${result.quantity}.`
+        : '',
+    )
   }
 
   function handleWishlist() {
@@ -152,6 +165,14 @@ export default function Product() {
                         setSize(labelText)
                         setSizeError('')
                         setAdded(false)
+                        setStockNote('')
+                        // The new size may already have units in the cart, so
+                        // trim the chosen quantity to what is still available.
+                        const left = Math.max(
+                          1,
+                          product.stock - quantityInCart(product.id, labelText),
+                        )
+                        setQuantity((q) => Math.min(q, left))
                       }}
                       className={`rounded-md border px-3 py-2 text-sm font-semibold transition ${
                         size === labelText
@@ -172,16 +193,24 @@ export default function Product() {
             <input
               type="number"
               min={1}
-              max={product.stock || undefined}
+              max={maxSelectable}
               value={quantity}
+              disabled={outOfStock || atStockLimit}
               onChange={(e) => {
-                setQuantity(Math.max(1, Number(e.target.value) || 1))
+                // Never let the buyer pick more than the seller has left.
+                const next = Math.max(1, Math.floor(Number(e.target.value)) || 1)
+                setQuantity(Math.min(next, maxSelectable))
                 setAdded(false)
+                setStockNote('')
               }}
-              className="h-[47px] w-[60px] rounded-md border border-primary-border pl-2.5 text-base outline-none focus:border-primary"
+              className="h-[47px] w-[60px] rounded-md border border-primary-border pl-2.5 text-base outline-none focus:border-primary disabled:cursor-not-allowed disabled:bg-surface-2"
               aria-label="Quantity"
             />
-            <button className="btn-primary" onClick={handleAddToCart} disabled={outOfStock}>
+            <button
+              className="btn-primary"
+              onClick={handleAddToCart}
+              disabled={outOfStock || atStockLimit}
+            >
               {added ? 'Added to cart ✓' : 'Add to cart'}
             </button>
             <button
@@ -196,6 +225,19 @@ export default function Product() {
               <i className={`${wishlisted ? 'fas' : 'far'} fa-heart`}></i>
             </button>
           </div>
+
+          {atStockLimit && (
+            <p className="mt-2 text-xs font-semibold text-cta-ink">
+              Your cart already has all {product.stock} in stock
+              {size ? ` for ${size}` : ''}.
+            </p>
+          )}
+          {stockNote && <p className="mt-2 text-xs font-semibold text-cta-ink">{stockNote}</p>}
+          {!outOfStock && !atStockLimit && inCart > 0 && (
+            <p className="mt-2 text-xs text-muted-2">
+              {inCart} already in your cart · {remaining} still available
+            </p>
+          )}
 
           <h4 className="mb-3 mt-10 border-t border-primary-border pt-6 text-lg font-bold text-primary">
             Product details
