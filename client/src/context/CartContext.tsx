@@ -10,15 +10,30 @@ import type { CartItem, Product } from '../types'
 import { useAuth } from './AuthContext'
 import { clearCartDb, fetchCart, removeCartItem, setCartItem } from '../api/cart'
 
+/**
+ * What a cart write ended up doing, so the page can tell the buyer when their
+ * request was trimmed to the stock on hand.
+ */
+export interface CartWriteResult {
+  /** Quantity now on the line. */
+  quantity: number
+  /** True when the requested quantity was more than the stock available. */
+  capped: boolean
+  /** The stock the clamp was applied against. */
+  stock: number
+}
+
 interface CartContextValue {
   items: CartItem[]
   totalQuantity: number
   subtotal: number
   loading: boolean
-  addToCart: (product: Product, quantity?: number, size?: string) => Promise<void>
+  addToCart: (product: Product, quantity?: number, size?: string) => Promise<CartWriteResult>
   removeFromCart: (productId: string, size: string) => Promise<void>
-  setQuantity: (productId: string, size: string, quantity: number) => Promise<void>
+  setQuantity: (productId: string, size: string, quantity: number) => Promise<CartWriteResult>
   clearCart: () => Promise<void>
+  /** Quantity already in the cart for a product + size line. */
+  quantityInCart: (productId: string, size: string) => number
 }
 
 const CartContext = createContext<CartContextValue | undefined>(undefined)
@@ -27,6 +42,16 @@ const GUEST_KEY = 'cara-cart-guest'
 
 /** A cart line is identified by product + chosen size. */
 const lineKey = (productId: string, size: string) => `${productId}__${size}`
+
+/**
+ * Stock is the ceiling for a cart line: a buyer can never hold more of a
+ * product than the seller has. The server re-checks this at checkout — this is
+ * the same rule applied up front so the buyer isn't surprised at the till.
+ */
+function capToStock(stock: number, wanted: number): number {
+  const ceiling = Math.max(0, Math.floor(stock) || 0)
+  return Math.max(0, Math.min(Math.floor(wanted) || 0, ceiling))
+}
 
 function loadGuest(): CartItem[] {
   try {
@@ -76,10 +101,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       for (const g of guest) {
         const key = lineKey(g.product.id, g.size)
         const existing = merged.get(key)
+        const product = existing?.product ?? g.product
         merged.set(key, {
-          product: existing?.product ?? g.product,
+          product,
           size: g.size,
-          quantity: (existing?.quantity ?? 0) + g.quantity,
+          // Two carts adding up can overshoot stock — keep the line at 1 or more
+          // so the row survives (cart_items requires quantity > 0) and let
+          // checkout reject what can no longer be fulfilled.
+          quantity: Math.max(
+            1,
+            capToStock(product.stock, (existing?.quantity ?? 0) + g.quantity),
+          ),
         })
       }
       await Promise.all(
@@ -100,9 +132,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id])
 
-  async function addToCart(product: Product, quantity = 1, size = '') {
+  async function addToCart(
+    product: Product,
+    quantity = 1,
+    size = '',
+  ): Promise<CartWriteResult> {
     const existing = items.find((i) => i.product.id === product.id && i.size === size)
-    const newQty = (existing?.quantity ?? 0) + quantity
+    const current = existing?.quantity ?? 0
+    const wanted = current + Math.max(1, Math.floor(quantity) || 1)
+    const newQty = capToStock(product.stock, wanted)
+    const result: CartWriteResult = {
+      quantity: newQty,
+      capped: newQty < wanted,
+      stock: product.stock,
+    }
+
+    // Nothing left to add — the line already holds every unit in stock (or the
+    // product is out of stock entirely).
+    if (newQty === current) return result
+
     if (user) await setCartItem(user.id, product.id, size, newQty)
     setItems((prev) => {
       const found = prev.some((i) => i.product.id === product.id && i.size === size)
@@ -114,10 +162,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!user) saveGuest(next)
       return next
     })
+    return result
   }
 
-  async function setQuantity(productId: string, size: string, quantity: number) {
-    const safe = Math.max(1, Math.floor(quantity) || 1)
+  async function setQuantity(
+    productId: string,
+    size: string,
+    quantity: number,
+  ): Promise<CartWriteResult> {
+    const line = items.find((i) => i.product.id === productId && i.size === size)
+    if (!line) return { quantity: 0, capped: false, stock: 0 }
+
+    const wanted = Math.max(1, Math.floor(quantity) || 1)
+    // A line never drops below 1 (cart_items requires quantity > 0); removing is
+    // what removeFromCart is for.
+    const safe = Math.max(1, capToStock(line.product.stock, wanted))
+    const result: CartWriteResult = {
+      quantity: safe,
+      capped: safe < wanted,
+      stock: line.product.stock,
+    }
+
     if (user) await setCartItem(user.id, productId, size, safe)
     setItems((prev) => {
       const next = prev.map((i) =>
@@ -126,6 +191,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!user) saveGuest(next)
       return next
     })
+    return result
   }
 
   async function removeFromCart(productId: string, size: string) {
@@ -143,6 +209,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
+  const quantityInCart = (productId: string, size: string) =>
+    items.find((i) => i.product.id === productId && i.size === size)?.quantity ?? 0
+
   const value = useMemo<CartContextValue>(() => {
     const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0)
     const subtotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
@@ -155,6 +224,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromCart,
       setQuantity,
       clearCart,
+      quantityInCart,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, loading, user])

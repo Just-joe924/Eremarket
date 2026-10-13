@@ -2,12 +2,27 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { formatNaira } from '../lib/money'
+import type { CartItem } from '../types'
 
 export default function Cart() {
   const { items, subtotal, removeFromCart, setQuantity, clearCart } = useCart()
   const navigate = useNavigate()
   const [coupon, setCoupon] = useState('')
   const [couponMsg, setCouponMsg] = useState('')
+  const [stockNote, setStockNote] = useState('')
+
+  // Lines the seller can no longer fulfil — stock may have fallen since the
+  // item went into the cart. Checkout would reject these, so block it here.
+  const unfulfillable = items.filter((i) => i.quantity > i.product.stock)
+
+  async function handleQuantityChange(item: CartItem, value: number) {
+    const result = await setQuantity(item.product.id, item.size, value)
+    setStockNote(
+      result.capped
+        ? `${item.product.name}: only ${result.stock} in stock, quantity set to ${result.quantity}.`
+        : '',
+    )
+  }
 
   function applyCoupon() {
     setCouponMsg(
@@ -80,13 +95,23 @@ export default function Cart() {
                         <input
                           type="number"
                           min={1}
+                          max={Math.max(1, item.product.stock)}
                           value={item.quantity}
-                          onChange={(e) =>
-                            setQuantity(item.product.id, item.size, Number(e.target.value))
-                          }
+                          onChange={(e) => handleQuantityChange(item, Number(e.target.value))}
                           aria-label={`Quantity for ${item.product.name}`}
                           className="w-[70px] rounded-md border border-primary-border py-2 text-center outline-none focus:border-primary"
                         />
+                        {item.product.stock <= 0 ? (
+                          <span className="mt-1 block text-[11px] font-bold text-accent">
+                            Out of stock
+                          </span>
+                        ) : (
+                          item.quantity >= item.product.stock && (
+                            <span className="mt-1 block text-[11px] font-bold text-cta-ink">
+                              Max {item.product.stock} in stock
+                            </span>
+                          )
+                        )}
                       </td>
                       <td className="px-3 py-4 font-bold text-primary">
                         {formatNaira(item.product.price * item.quantity)}
@@ -96,6 +121,20 @@ export default function Cart() {
                 </tbody>
               </table>
             </div>
+
+            {stockNote && (
+              <p className="mt-3 rounded border-l-[3px] border-cta bg-cta-soft px-3 py-2 text-sm font-semibold text-cta-ink">
+                {stockNote}
+              </p>
+            )}
+
+            {unfulfillable.length > 0 && (
+              <p className="mt-3 rounded border-l-[3px] border-accent bg-[#fdecec] px-3 py-2 text-sm text-accent">
+                {unfulfillable.map((i) => i.product.name).join(', ')}{' '}
+                {unfulfillable.length === 1 ? 'is' : 'are'} no longer available in the quantity you
+                picked. Lower the quantity or remove the item to continue.
+              </p>
+            )}
 
             <div className="mt-5">
               <button className="btn-normal" onClick={clearCart}>
@@ -153,11 +192,16 @@ export default function Cart() {
           </table>
           <button
             className="btn-primary w-full"
-            disabled={items.length === 0}
+            disabled={items.length === 0 || unfulfillable.length > 0}
             onClick={() => navigate('/checkout')}
           >
             Proceed to checkout
           </button>
+          {unfulfillable.length > 0 && (
+            <p className="mt-2 text-xs text-accent">
+              Fix the highlighted quantities above to check out.
+            </p>
+          )}
         </div>
       </section>
     </>

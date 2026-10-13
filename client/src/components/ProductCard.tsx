@@ -19,6 +19,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   function handleAddToCart(e: MouseEvent) {
     e.stopPropagation()
+    if (outOfStock) return
     // Products with sizes need a size chosen — send the buyer to the detail page.
     if (product.sizes && product.sizes.length > 0) {
       navigate(`/product/${product.slug}`)
@@ -82,8 +83,9 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
           <h4 className="text-[17px] font-bold text-primary">{formatNaira(product.price)}</h4>
           <button
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cta text-sm text-primary-dark transition hover:bg-cta-hover"
-            aria-label={`Add ${product.name} to cart`}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-cta text-sm text-primary-dark transition hover:bg-cta-hover disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted-2 disabled:hover:bg-surface-2"
+            aria-label={outOfStock ? `${product.name} is out of stock` : `Add ${product.name} to cart`}
+            disabled={outOfStock}
             onClick={handleAddToCart}
           >
             <i className="fas fa-shopping-cart"></i>

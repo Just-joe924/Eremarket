@@ -45,14 +45,22 @@ export default function Wishlist() {
                   <h5 className="line-clamp-2 min-h-[2.5rem] pt-1 text-sm font-semibold text-ink">
                     {product.name}
                   </h5>
+                  {product.stock <= 0 && (
+                    <span className="pt-1.5 text-[11px] font-bold text-accent">Out of stock</span>
+                  )}
                   <div className="mt-auto flex items-center justify-between gap-2 pt-3">
                     <h4 className="text-[17px] font-bold text-primary">
                       {formatNaira(product.price)}
                     </h4>
                     <div className="flex gap-2">
                       <button
-                        className="flex h-9 w-9 items-center justify-center rounded-md bg-cta text-sm text-primary-dark transition hover:bg-cta-hover"
-                        aria-label={`Add ${product.name} to cart`}
+                        className="flex h-9 w-9 items-center justify-center rounded-md bg-cta text-sm text-primary-dark transition hover:bg-cta-hover disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted-2 disabled:hover:bg-surface-2"
+                        aria-label={
+                          product.stock <= 0
+                            ? `${product.name} is out of stock`
+                            : `Add ${product.name} to cart`
+                        }
+                        disabled={product.stock <= 0}
                         onClick={() =>
                           product.sizes?.length
                             ? navigate(`/product/${product.slug}`)
