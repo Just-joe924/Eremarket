@@ -349,6 +349,216 @@ export async function sendOrderReceipt(orderId: string): Promise<void> {
   await sendEmail(email, subject, html)
 }
 
+// --- seller: new order --------------------------------------------------------
+
+export interface SellerNotificationItem {
+  name: string
+  quantity: number
+  price_at_purchase: number
+  size: string | null
+}
+
+export interface SellerNotificationInput {
+  order: {
+    id: string
+    created_at: string
+    payment_method: 'online' | 'pickup'
+    fulfilment: 'delivery' | 'pickup'
+    shipping_address: Record<string, unknown> | null
+  }
+  seller: { business_name: string; brand_name: string | null }
+  /** Only the lines belonging to this seller — other sellers' items are not theirs to see. */
+  items: SellerNotificationItem[]
+}
+
+/**
+ * Build the "you've got a new order" email for one seller. Pure, like
+ * buildOrderReceipt, so it can be previewed without a database.
+ */
+export function buildSellerOrderNotification(input: SellerNotificationInput): { subject: string; html: string } {
+  const { order, seller, items } = input
+  const shipping = order.shipping_address ?? {}
+  const ref = order.id.slice(0, 8).toUpperCase()
+  const shopName = seller.brand_name || seller.business_name
+  const placed = new Date(order.created_at).toLocaleString('en-NG', { dateStyle: 'long', timeStyle: 'short' })
+
+  const buyerName =
+    typeof shipping.full_name === 'string' && shipping.full_name.trim() ? shipping.full_name.trim() : 'A customer'
+  const buyerPhone = typeof shipping.phone === 'string' ? shipping.phone.trim() : ''
+  const address = [shipping.address, shipping.city, shipping.state]
+    .filter((v) => typeof v === 'string' && v.trim())
+    .map(esc)
+    .join(', ')
+
+  const payOnPickup = order.payment_method === 'pickup'
+  const isPickup = payOnPickup || order.fulfilment === 'pickup'
+  const subtotal = items.reduce((sum, it) => sum + it.price_at_purchase * it.quantity, 0)
+  const unitCount = items.reduce((sum, it) => sum + it.quantity, 0)
+  const itemsWord = unitCount === 1 ? 'an item' : `${unitCount} items`
+
+  const rows = items
+    .map(
+      (it) => `<tr>
+        <td style="padding:10px 0;border-bottom:1px solid #f1f3f6;font-size:14px;color:${INK};">
+          ${esc(it.name)}
+          ${it.size ? `<span style="color:${MUTED};"> (${esc(it.size)})</span>` : ''}
+          <span style="color:${MUTED};"> × ${it.quantity}</span>
+        </td>
+        <td style="padding:10px 0;border-bottom:1px solid #f1f3f6;font-size:14px;color:${INK};text-align:right;white-space:nowrap;">
+          ${esc(formatNaira(it.price_at_purchase * it.quantity))}
+        </td>
+      </tr>`,
+    )
+    .join('')
+
+  const intro = payOnPickup
+    ? `<strong>${esc(buyerName)}</strong> has reserved ${itemsWord} from ${esc(shopName)} and will pay <strong>${esc(formatNaira(subtotal))}</strong> on collection. Please set ${unitCount === 1 ? 'it' : 'them'} aside.`
+    : `<strong>${esc(buyerName)}</strong> just paid for ${itemsWord} from ${esc(shopName)}. ${isPickup ? 'Please get the order ready for collection.' : 'Please get the order ready to ship.'}`
+
+  const nextStep = isPickup
+    ? 'When the order is packed, mark it <strong>ready</strong> in your seller dashboard so the buyer knows to come in.'
+    : 'When it has been dispatched, mark it <strong>shipped</strong> in your seller dashboard so the buyer is notified.'
+
+  const body = `
+    <p style="margin:0 0 20px;">${intro}</p>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafbfc;border:1px solid ${LINE};border-radius:8px;padding:14px 18px;">
+      ${detailRow('Order', `<strong>#${esc(ref)}</strong>`)}
+      ${detailRow('Placed', esc(placed))}
+      ${detailRow(
+        'Payment',
+        payOnPickup
+          ? `<span style="color:#b26a00;font-weight:600;">Due on collection</span>`
+          : `<span style="color:#059669;font-weight:600;">Paid online</span>`,
+      )}
+      ${detailRow('Fulfilment', isPickup ? 'Buyer collects in store' : 'Delivery')}
+      ${detailRow('Buyer', esc(buyerName))}
+      ${buyerPhone ? detailRow('Phone', `<a href="tel:${esc(buyerPhone)}" style="color:${BRAND};text-decoration:none;">${esc(buyerPhone)}</a>`) : ''}
+    </table>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;border-collapse:collapse;">
+      ${rows}
+      <tr>
+        <td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${INK};">Your items</td>
+        <td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${BRAND};text-align:right;white-space:nowrap;">
+          ${esc(formatNaira(subtotal))}
+        </td>
+      </tr>
+    </table>
+
+    ${
+      !isPickup && address
+        ? `<div style="margin-top:22px;padding:16px 18px;background:#fafbfc;border-left:3px solid ${BRAND};border-radius:6px;font-size:14px;">
+             <strong style="color:${INK};">Deliver to</strong><br>
+             <span style="color:#374151;">${address}</span>
+           </div>`
+        : ''
+    }
+
+    <p style="margin:22px 0 0;font-size:14px;color:${MUTED};">${nextStep}</p>`
+
+  return {
+    subject: payOnPickup
+      ? `New pickup order #${ref} — ${formatNaira(subtotal)} due on collection`
+      : `New order #${ref} — ${formatNaira(subtotal)} paid`,
+    html: layout({
+      preheader: `${buyerName} ordered ${unitCount === 1 ? '1 item' : `${unitCount} items`} from ${shopName}.`,
+      heading: 'You have a new order',
+      subheading: `Order #${ref} · ${shopName}`,
+      bodyHtml: body,
+      cta: { label: 'View order', url: `${env.CLIENT_ORIGIN}/seller/orders` },
+      footerNote: `You're receiving this because ${shopName} sells on EreMarket.`,
+    }),
+  }
+}
+
+interface SellerOrderSeller {
+  id: string
+  user_id: string
+  business_name: string
+  brand_name: string | null
+  email: string | null
+}
+
+interface SellerOrderRow {
+  id: string
+  created_at: string
+  payment_method: 'online' | 'pickup'
+  fulfilment: 'delivery' | 'pickup'
+  shipping_address: Record<string, unknown> | null
+  order_items: Array<{
+    quantity: number
+    price_at_purchase: number
+    size: string | null
+    products: { name: string; sellers: SellerOrderSeller | null } | null
+  }> | null
+}
+
+/**
+ * Notify every seller with a line in the order. Fires alongside the buyer's
+ * receipt — on payment for online orders, on reservation for pay-on-pickup.
+ * One email per seller, containing only that seller's items. Platform ("house")
+ * products with no seller are skipped. Best-effort: never throws.
+ */
+export async function sendSellerOrderNotifications(orderId: string): Promise<void> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('orders')
+      .select(
+        'id, created_at, payment_method, fulfilment, shipping_address, ' +
+          'order_items(quantity, price_at_purchase, size, products(name, sellers(id, user_id, business_name, brand_name, email)))',
+      )
+      .eq('id', orderId)
+      .maybeSingle()
+    if (error) {
+      console.error(`[email] could not load order ${orderId} for seller notifications: ${error.message}`)
+      return
+    }
+    const order = data as unknown as SellerOrderRow | null
+    if (!order) return
+
+    // Group this order's lines by the seller who owns the product.
+    const bySeller = new Map<string, { seller: SellerOrderSeller; items: SellerNotificationItem[] }>()
+    for (const it of order.order_items ?? []) {
+      const seller = it.products?.sellers
+      if (!seller) continue
+      const entry = bySeller.get(seller.id) ?? { seller, items: [] }
+      entry.items.push({
+        name: it.products?.name ?? 'Product',
+        quantity: it.quantity,
+        price_at_purchase: Number(it.price_at_purchase),
+        size: it.size,
+      })
+      bySeller.set(seller.id, entry)
+    }
+
+    await Promise.all(
+      [...bySeller.values()].map(async ({ seller, items }) => {
+        // Prefer the contact email on the shop profile; fall back to the login email.
+        let to = seller.email?.trim() || null
+        if (!to) {
+          const { data: u } = await supabaseAdmin.auth.admin.getUserById(seller.user_id)
+          to = u?.user?.email ?? null
+        }
+        const { subject, html } = buildSellerOrderNotification({
+          order: {
+            id: order.id,
+            created_at: order.created_at,
+            payment_method: order.payment_method,
+            fulfilment: order.fulfilment,
+            shipping_address: order.shipping_address,
+          },
+          seller: { business_name: seller.business_name, brand_name: seller.brand_name },
+          items,
+        })
+        await sendEmail(to, subject, html)
+      }),
+    )
+  } catch (err) {
+    console.error(`[email] seller notifications failed for order ${orderId}:`, err)
+  }
+}
+
 /**
  * Per-item fulfillment email. Fires when a seller moves an item to `shipped`
  * ("ready / on its way") or `delivered` (a review request). Other statuses are ignored.
