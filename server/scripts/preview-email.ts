@@ -8,7 +8,12 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { buildContactMessage, buildOrderReceipt, type ReceiptOrder } from '../src/lib/email.js'
+import {
+  buildContactMessage,
+  buildOrderReceipt,
+  buildSellerOrderNotification,
+  type ReceiptOrder,
+} from '../src/lib/email.js'
 
 const OUT = join(process.cwd(), '.email-preview')
 mkdirSync(OUT, { recursive: true })
@@ -55,9 +60,31 @@ const pickupOrder: ReceiptOrder = {
   payment_reference: null,
 }
 
+/** The same order as one seller sees it: only their lines, no buyer-facing copy. */
+function sellerOrder(order: ReceiptOrder) {
+  return {
+    order: {
+      id: order.id,
+      created_at: order.created_at,
+      payment_method: order.payment_method,
+      fulfilment: order.fulfilment,
+      shipping_address: order.shipping_address,
+    },
+    seller: { business_name: shop.business_name, brand_name: shop.brand_name },
+    items: (order.order_items ?? []).map((it) => ({
+      name: it.products?.name ?? 'Product',
+      quantity: it.quantity,
+      price_at_purchase: it.price_at_purchase,
+      size: it.size,
+    })),
+  }
+}
+
 const previews: Array<[string, { subject: string; html: string }]> = [
   ['receipt-paid-online.html', buildOrderReceipt(baseOrder, 'Chidinma')],
   ['receipt-pay-on-pickup.html', buildOrderReceipt(pickupOrder, 'Chidinma')],
+  ['seller-new-order-paid.html', buildSellerOrderNotification(sellerOrder(baseOrder))],
+  ['seller-new-order-pickup.html', buildSellerOrderNotification(sellerOrder(pickupOrder))],
   [
     'contact-message.html',
     buildContactMessage({

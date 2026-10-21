@@ -9,7 +9,7 @@ import {
   decrementStock,
   loadCartLines,
 } from '../services/orders.js'
-import { sendOrderReceipt } from '../lib/email.js'
+import { sendOrderReceipt, sendSellerOrderNotifications } from '../lib/email.js'
 
 export const ordersRouter = Router()
 
@@ -49,6 +49,7 @@ ordersRouter.post('/', requireAuth, async (req: Request, res: Response) => {
     await decrementStock(lines)
     await clearCart(userId)
     await sendOrderReceipt(order.id)
+    await sendSellerOrderNotifications(order.id)
     return res.status(201).json({ order: { ...order, order_items: orderItems } })
   } catch (err) {
     if (err instanceof OrderError) {
